@@ -53,14 +53,23 @@ class TariffSeoController extends Controller
             'seo_footer_text'  => ['nullable', 'string'],
             'meta_title'       => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
+            'faqs'             => ['nullable', 'array'],
+            'faqs.*.question'  => ['required_with:faqs.*', 'string', 'max:500'],
+            'faqs.*.answer'    => ['required_with:faqs.*', 'string'],
         ]);
 
-        // page_key otomatik üret
+        // Boş SSS satırlarını temizle
+        if (!empty($validated['faqs'])) {
+            $validated['faqs'] = array_values(
+                array_filter($validated['faqs'], fn($f) => !empty($f['question']) && !empty($f['answer']))
+            );
+            if (empty($validated['faqs'])) $validated['faqs'] = null;
+        }
+
         $validated['page_key'] = $validated['district_slug']
             ? TariffSeoContent::districtKey($validated['city_slug'], $validated['district_slug'])
             : TariffSeoContent::cityKey($validated['city_slug']);
 
-        // Aynı page_key zaten varsa güncelle
         TariffSeoContent::updateOrCreate(
             ['page_key' => $validated['page_key']],
             $validated
@@ -86,7 +95,20 @@ class TariffSeoController extends Controller
             'seo_footer_text'  => ['nullable', 'string'],
             'meta_title'       => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string'],
+            'faqs'             => ['nullable', 'array'],
+            'faqs.*.question'  => ['required_with:faqs.*', 'string', 'max:500'],
+            'faqs.*.answer'    => ['required_with:faqs.*', 'string'],
         ]);
+
+        // Boş SSS satırlarını temizle
+        if (!empty($validated['faqs'])) {
+            $validated['faqs'] = array_values(
+                array_filter($validated['faqs'], fn($f) => !empty($f['question']) && !empty($f['answer']))
+            );
+            if (empty($validated['faqs'])) {
+                $validated['faqs'] = null;
+            }
+        }
 
         $tariffSeo->update($validated);
 

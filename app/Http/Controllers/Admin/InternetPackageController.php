@@ -25,20 +25,30 @@ class InternetPackageController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'operator_id' => 'required|exists:operators,id',
-            'name' => 'required|max:255',
-            'price' => 'required|numeric',
-            'speed' => 'required|integer',
-            'upload_speed' => 'nullable|integer',
-            'quota' => 'required|max:255',
-            'commitment_period' => 'required|integer',
+            'operator_id'         => 'required|exists:operators,id',
+            'name'                => 'required|max:255',
+            'price'               => 'required|numeric',
+            'speed'               => 'required|integer',
+            'upload_speed'        => 'nullable|integer',
+            'quota'               => 'required|max:255',
+            'commitment_period'   => 'required|integer',
             'infrastructure_type' => 'nullable|max:255',
-            'is_active' => 'boolean',
-            'is_sponsored' => 'boolean',
+            'description'         => 'nullable|string',
+            'advantages'          => 'nullable|string',
+            'disadvantages'       => 'nullable|string',
+            'affiliate_url'       => 'nullable|url|max:500',
+            'modem_included'      => 'nullable|in:free,paid',
+            'seo_title'           => 'nullable|max:255',
+            'seo_description'     => 'nullable|string',
+            'is_active'           => 'boolean',
+            'is_sponsored'        => 'boolean',
+            'apply_type'          => 'required|in:site,call,form',
+            'external_url'        => 'nullable|url|max:500',
+            'call_number'         => 'nullable|max:32',
         ]);
 
         $validated['slug'] = Str::slug($request->name . '-' . rand(100, 999));
-        
+
         InternetPackage::create($validated);
 
         return redirect()->route('admin.packages.index')->with('success', 'Paket başarıyla eklendi.');
@@ -53,22 +63,32 @@ class InternetPackageController extends Controller
     public function update(Request $request, InternetPackage $package)
     {
         $validated = $request->validate([
-            'operator_id' => 'required|exists:operators,id',
-            'name' => 'required|max:255',
-            'price' => 'required|numeric',
-            'speed' => 'required|integer',
-            'upload_speed' => 'nullable|integer',
-            'quota' => 'required|max:255',
-            'commitment_period' => 'required|integer',
+            'operator_id'         => 'required|exists:operators,id',
+            'name'                => 'required|max:255',
+            'price'               => 'required|numeric',
+            'speed'               => 'required|integer',
+            'upload_speed'        => 'nullable|integer',
+            'quota'               => 'required|max:255',
+            'commitment_period'   => 'required|integer',
             'infrastructure_type' => 'nullable|max:255',
-            'is_active' => 'boolean',
-            'is_sponsored' => 'boolean',
+            'description'         => 'nullable|string',
+            'advantages'          => 'nullable|string',
+            'disadvantages'       => 'nullable|string',
+            'affiliate_url'       => 'nullable|url|max:500',
+            'modem_included'      => 'nullable|in:free,paid',
+            'seo_title'           => 'nullable|max:255',
+            'seo_description'     => 'nullable|string',
+            'is_active'           => 'boolean',
+            'is_sponsored'        => 'boolean',
+            'apply_type'          => 'required|in:site,call,form',
+            'external_url'        => 'nullable|url|max:500',
+            'call_number'         => 'nullable|max:32',
         ]);
 
         if ($package->name !== $request->name) {
             $validated['slug'] = Str::slug($request->name . '-' . rand(100, 999));
         }
-        
+
         $package->update($validated);
 
         return redirect()->route('admin.packages.index')->with('success', 'Paket başarıyla güncellendi.');

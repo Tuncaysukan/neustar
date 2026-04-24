@@ -16,6 +16,7 @@ class Operator extends Model
         'description',
         'seo_title',
         'seo_description',
+        'seo_text',
         'is_active',
     ];
 
@@ -44,7 +45,7 @@ class Operator extends Model
             if (str_starts_with($logo, 'http://') || str_starts_with($logo, 'https://')) {
                 return $logo;
             }
-            return Storage::disk('public')->url($logo);
+            return '/storage/' . ltrim($logo, '/');
         });
     }
 

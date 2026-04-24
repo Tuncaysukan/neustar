@@ -12,6 +12,7 @@ class Blog extends Model
     protected $fillable = [
         'title',
         'slug',
+        'blog_category_id',
         'content',
         'excerpt',
         'category',
@@ -22,6 +23,11 @@ class Blog extends Model
         'seo_title',
         'seo_description',
     ];
+
+    public function categoryRel()
+    {
+        return $this->belongsTo(BlogCategory::class, 'blog_category_id');
+    }
 
     protected $casts = [
         'is_active'    => 'boolean',

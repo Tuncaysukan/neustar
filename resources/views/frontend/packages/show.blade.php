@@ -83,9 +83,10 @@
                         </dl>
 
                         <div class="mt-5 flex flex-col sm:flex-row gap-2" x-data>
-                            <button type="button" class="btn btn-primary flex-1">
+                            <a href="{{ route('packages.apply', $package->slug) }}"
+                               class="btn btn-primary flex-1">
                                 Başvur
-                            </button>
+                            </a>
                             <button type="button"
                                     class="btn btn-outline"
                                     @click="
@@ -95,13 +96,28 @@
                                         if (!res.ok && res.reason === 'limit') alert('En fazla 5 paket karşılaştırabilirsin.');
                                     "
                                     :class="$store.compare.has({{ $package->id }}) ? 'btn-error' : ''">
-                                <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Kıyasla'"></span>
+                                <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Karşılaştır'"></span>
                             </button>
                         </div>
 
                         <p class="mt-3 text-xs text-base-content/55">
                             Karşılaştırmada en fazla 5 paket tutulur.
                         </p>
+
+                        @if($package->operator->website_url)
+                        <div class="mt-3 pt-3 border-t border-base-300">
+                            <a href="{{ $package->operator->website_url }}"
+                               target="_blank" rel="noopener noreferrer nofollow"
+                               class="flex items-center gap-1.5 text-xs text-base-content/50 hover:text-primary transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none"
+                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                Detaylı bilgi için operatörün sitesini ziyaret edin
+                            </a>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -111,9 +127,89 @@
     {{-- ===== Body ===== --}}
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+            {{-- ── Ana içerik (sol/orta) ── --}}
             <div class="lg:col-span-8 space-y-10">
 
-                {{-- Özet --}}
+                {{-- Tarife Hakkında --}}
+                @if($package->description)
+                <section class="ns-surface rounded-xl p-6 sm:p-8">
+                    <h2 class="text-xl font-bold mb-4">Tarife hakkında</h2>
+                    <div class="text-sm sm:text-base text-base-content/75 leading-relaxed whitespace-pre-line">{{ $package->description }}</div>
+                </section>
+                @endif
+
+                {{-- Tarife Detayları — ANA İÇERİKTE --}}
+                <section class="ns-surface rounded-xl p-6 sm:p-8">
+                    <h2 class="text-xl font-bold mb-6">Tarife detayları</h2>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        {{-- Fiyat --}}
+                        <div class="ns-surface rounded-xl p-4 border border-primary/20 bg-primary/5 col-span-2 sm:col-span-1">
+                            <div class="text-xs text-base-content/55 mb-1">Aylık ücret</div>
+                            <div class="text-2xl font-bold text-primary">
+                                {{ number_format($package->price, 2, ',', '.') }}
+                                <span class="text-sm font-normal text-base-content/55">TL</span>
+                            </div>
+                        </div>
+                        {{-- İndirme --}}
+                        <div class="ns-surface rounded-xl p-4">
+                            <div class="text-xs text-base-content/55 mb-1">İndirme hızı</div>
+                            <div class="text-xl font-bold">{{ $package->speed }}
+                                <span class="text-sm font-normal text-base-content/55">Mbps</span>
+                            </div>
+                        </div>
+                        {{-- Yükleme --}}
+                        <div class="ns-surface rounded-xl p-4">
+                            <div class="text-xs text-base-content/55 mb-1">Yükleme hızı</div>
+                            <div class="text-xl font-bold">
+                                {{ $package->upload_speed ? $package->upload_speed : '—' }}
+                                @if($package->upload_speed)
+                                    <span class="text-sm font-normal text-base-content/55">Mbps</span>
+                                @endif
+                            </div>
+                        </div>
+                        {{-- Kota --}}
+                        <div class="ns-surface rounded-xl p-4">
+                            <div class="text-xs text-base-content/55 mb-1">Kota</div>
+                            <div class="text-base font-bold">{{ $package->quota }}</div>
+                        </div>
+                        {{-- Altyapı --}}
+                        <div class="ns-surface rounded-xl p-4">
+                            <div class="text-xs text-base-content/55 mb-1">Altyapı</div>
+                            <div class="text-base font-bold">{{ $package->infrastructure_type ?: '—' }}</div>
+                        </div>
+                        {{-- Taahhüt --}}
+                        <div class="ns-surface rounded-xl p-4">
+                            <div class="text-xs text-base-content/55 mb-1">Taahhüt</div>
+                            <div class="text-base font-bold">
+                                {{ $package->commitment_period > 0 ? $package->commitment_period . ' ay' : 'Taahhütsüz' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Başvur CTA --}}
+                    <div class="mt-6 flex flex-col sm:flex-row gap-3 pt-6 border-t border-base-300">
+                        <a href="{{ route('packages.apply', $package->slug) }}"
+                           class="btn btn-primary sm:w-auto">
+                            Hemen başvur →
+                        </a>
+                        @if($package->operator->website_url)
+                        <a href="{{ $package->operator->website_url }}"
+                           target="_blank" rel="noopener noreferrer nofollow"
+                           class="btn btn-ghost btn-sm self-center text-xs text-base-content/50 hover:text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            Operatörün resmi sitesi
+                        </a>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- Paket özeti --}}
                 <section class="ns-surface rounded-xl p-6 sm:p-8">
                     <h2 class="text-xl font-bold">Paket özeti</h2>
 
@@ -203,19 +299,14 @@
                 <section class="ns-surface rounded-xl p-6 sm:p-8">
                     <h2 class="text-xl font-bold">Sıkça sorulan sorular</h2>
 
-                    <div class="mt-5 divide-y divide-base-300 border-y border-base-300">
+                    <div class="mt-5 space-y-4">
                         @foreach($faqs as $faq)
-                            <details class="group">
-                                <summary class="cursor-pointer select-none py-4 flex items-center justify-between gap-4">
-                                    <span class="text-base font-medium">{{ $faq->question }}</span>
-                                    <span class="shrink-0 text-base-content/40 group-open:rotate-180 transition">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
-                                        </svg>
-                                    </span>
+                            <details class="collapse collapse-plus ns-surface border border-base-300 rounded-xl bg-base-100">
+                                <summary class="collapse-title text-sm font-semibold">
+                                    {{ $faq->question }}
                                 </summary>
-                                <div class="pb-5 text-sm text-base-content/70 leading-relaxed">
-                                    {{ $faq->answer }}
+                                <div class="collapse-content text-sm text-base-content/70"> 
+                                    <p>{{ $faq->answer }}</p>
                                 </div>
                             </details>
                         @endforeach
@@ -282,39 +373,62 @@
                 </section>
             </div>
 
-            {{-- Aside --}}
+            {{-- ── Aside (sağ) ── --}}
             <aside class="lg:col-span-4 space-y-4">
+
+                {{-- Başvur kutusu --}}
+                <div class="ns-surface rounded-xl p-6">
+                    <div class="flex items-center justify-between gap-3 mb-1">
+                        <h3 class="text-base font-semibold">Hemen başvur</h3>
+                        @if($package->is_sponsored)
+                            <span class="text-xs font-medium text-primary">Sponsor</span>
+                        @endif
+                    </div>
+                    <p class="text-sm text-base-content/65 leading-relaxed">
+                        {{ $package->operator->name }} resmi sitesine yönlendirileceksiniz.
+                    </p>
+                    <div class="mt-4">
+                        <a href="{{ route('packages.apply', $package->slug) }}"
+                           class="btn btn-primary w-full">
+                            Başvur →
+                        </a>
+                    </div>
+                    @if($package->operator->website_url)
+                    <div class="mt-3 pt-3 border-t border-base-300">
+                        <a href="{{ $package->operator->website_url }}"
+                           target="_blank" rel="noopener noreferrer nofollow"
+                           class="flex items-center gap-1.5 text-xs text-base-content/50 hover:text-primary transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none"
+                                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                            Operatörün resmi sitesi
+                        </a>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- Karşılaştırma sepeti --}}
                 <div class="ns-surface rounded-xl p-6">
                     <h3 class="text-base font-semibold">Karşılaştırma sepeti</h3>
                     <p class="mt-1 text-sm text-base-content/65 leading-relaxed">
                         Bu paketi sepete ekle, 5 pakete kadar karşılaştır.
                     </p>
                     <div class="mt-4 flex gap-2" x-data>
-                        <button type="button" class="btn btn-primary btn-sm flex-1"
+                        <button type="button" class="btn btn-outline btn-sm flex-1"
                                 @click="
                                     const res = $store.compare.has({{ $package->id }})
                                         ? ($store.compare.remove({{ $package->id }}), { ok: true, reason: 'removed' })
                                         : $store.compare.add({{ $package->id }});
                                     if (!res.ok && res.reason === 'limit') alert('En fazla 5 paket karşılaştırabilirsin.');
                                 ">
-                            <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Ekle'"></span>
+                            <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Karşılaştır'"></span>
                         </button>
                         <a class="btn btn-outline btn-sm" :href="$store.compare.url()">Aç</a>
                     </div>
                 </div>
 
-                <div class="ns-surface rounded-xl p-6">
-                    <h3 class="text-base font-semibold">Altyapı sorgula</h3>
-                    <p class="mt-1 text-sm text-base-content/65 leading-relaxed">
-                        Adresine uygun altyapıyı gör.
-                    </p>
-                    <form class="mt-4 space-y-3">
-                        <input type="text" placeholder="İl" class="input input-bordered input-sm w-full rounded-md" />
-                        <input type="text" placeholder="İlçe" class="input input-bordered input-sm w-full rounded-md" />
-                        <input type="tel" placeholder="Telefon (opsiyonel)" class="input input-bordered input-sm w-full rounded-md" />
-                        <button type="button" class="btn btn-primary btn-sm btn-block">Sorgula</button>
-                    </form>
-                </div>
             </aside>
         </div>
     </section>

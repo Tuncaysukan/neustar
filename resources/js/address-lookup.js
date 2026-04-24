@@ -75,7 +75,8 @@ export default function addressLookup() {
             );
             if (match) slug = match.slug;
             if (!slug) return;
-            window.location.href = `/internet-altyapi/${slug}`;
+            // Direkt tarife sayfasına yönlendir
+            window.location.href = `/internet-tarifeleri/ucuz-${slug}-ev-interneti-fiyatlari`;
         },
 
         submitSearch() {
@@ -103,6 +104,8 @@ export default function addressLookup() {
                 maxZoom: 8,
             });
             this._map.setView([39.0, 35.3], 5);
+            // Harita arka planını beyaz yap
+            el.style.backgroundColor = '#ffffff';
 
             try {
                 const res = await fetch('/data/tr-cities.json', { cache: 'force-cache' });

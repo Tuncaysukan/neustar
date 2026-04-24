@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', $cityName . ' ' . $districtName . ' İnternet Altyapı Sorgulama - Neustar')
-@section('meta_description', $cityName . ' ' . $districtName . ' için fiber, VDSL ve ADSL altyapı sorgulaması, port durumu ve güncel internet paketleri.')
+@section('title', ($meta['meta_title'] ?? null) ?: ($cityName . ' ' . $districtName . ' İnternet Altyapı Sorgulama - Neustar'))
+@section('meta_description', ($meta['meta_description'] ?? null) ?: ($cityName . ' ' . $districtName . ' için fiber, VDSL ve ADSL altyapı sorgulaması, port durumu ve güncel internet paketleri.'))
 
 @section('content')
     {{-- Header --}}
@@ -17,10 +17,10 @@
             </nav>
 
             <h1 class="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
-                {{ $cityName }} {{ $districtName }} altyapı sorgulama
+                {{ ($meta['h1'] ?? null) ?: ($cityName . ' ' . $districtName . ' Ev İnterneti Paket Karşılaştırma ve Altyapı Sorgulama') }}
             </h1>
             <p class="mt-3 text-sm sm:text-base text-base-content/70 leading-relaxed max-w-2xl">
-                Mahalle, sokak, bina ve daireni seç; altyapı durumunu ve uygun fiber / VDSL / ADSL paketleri anında göstereyim.
+                {{ ($meta['intro'] ?? null) ?: 'Mahalle, sokak, bina ve daireni seç; altyapı durumunu ve uygun fiber / VDSL / ADSL paketleri anında göstereyim.' }}
             </p>
         </div>
     </section>
@@ -407,8 +407,8 @@
                             <div>
                                 <label class="ns-meta-label block mb-1.5">Telefon</label>
                                 <input type="tel" class="input input-bordered w-full"
-                                       placeholder="05XX XXX XX XX" inputmode="tel" autocomplete="tel"
-                                       x-model="leadForm.phone">
+                                       inputmode="tel" autocomplete="tel"
+                                       x-model="leadForm.phone" @input="maskPhone($event.target); leadForm.phone = $event.target.value" @focus="maskPhone($event.target)">
                             </div>
                         </div>
 
@@ -416,12 +416,21 @@
                             <label>Website <input type="text" x-model="leadForm.hp" tabindex="-1" autocomplete="off"></label>
                         </div>
 
-                        <div class="mt-4 flex items-center justify-between gap-4 flex-wrap">
-                            <p class="text-[11px] text-base-content/50 leading-relaxed max-w-md">
-                                Gönderdiğinde
-                                <a href="{{ url('/gizlilik-politikasi') }}" class="underline underline-offset-2">gizlilik politikası</a>
-                                kabul edilmiş sayılır.
-                            </p>
+                            <div class="mt-4">
+                                <label class="flex items-start gap-3 cursor-pointer">
+                                    <input type="checkbox" x-model="leadForm.kvkk"
+                                           class="mt-1 rounded border-base-300 text-primary focus:ring-primary/40">
+                                    <span class="text-xs text-base-content/60 leading-relaxed">
+                                        <a href="{{ url('/kvkk-aydinlatma-metni') }}" class="underline underline-offset-2">KVKK aydınlatma metnini</a>
+                                        okudum, bilgilerimin işlenmesine izin veriyorum.
+                                    </span>
+                                </label>
+                            </div>
+
+                            <div class="mt-4 flex items-center justify-between gap-4 flex-wrap">
+                                <p class="text-[11px] text-base-content/50 leading-relaxed max-w-md">
+                                    Başvurunuzu ilettiğinizde uzman ekibimiz en kısa sürede size geri dönüş yapacaktır.
+                                </p>
                             <button type="button" class="btn btn-primary"
                                     :disabled="!canSubmitLead || leadSubmitting"
                                     @click="submitLead()">
@@ -470,4 +479,76 @@
             </p>
         </div>
     </section>
+
+    {{-- ================================================================
+         Sayfanın altı: Paketler + SSS + SEO footer
+         (wizard dışında, her zaman görünür)
+    ================================================================ --}}
+
+    {{-- Paketler --}}
+    @if($packages->isNotEmpty())
+    <section class="border-t border-base-300 py-10 sm:py-14">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between gap-3 mb-6">
+                <div>
+                    <div class="ns-section-eyebrow">Tarifeler</div>
+                    <h2 class="mt-1 text-xl font-bold">{{ $districtName }} için internet paketleri</h2>
+                </div>
+                <a href="{{ $tariffDistrictUrl }}" class="btn btn-outline btn-sm whitespace-nowrap">
+                    Tümünü gör →
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                @foreach($packages->take(6) as $package)
+                    @include('frontend.tariffs._package-card', ['package' => $package])
+                @endforeach
+            </div>
+
+            @if($packages->count() > 6)
+            <div class="mt-6 text-center">
+                <a href="{{ $tariffDistrictUrl }}" class="btn btn-outline btn-sm">
+                    {{ $packages->count() - 6 }} paket daha gör
+                </a>
+            </div>
+            @endif
+        </div>
+    </section>
+    @endif
+
+    {{-- SSS --}}
+    @if($faqs->isNotEmpty())
+    <section class="border-t border-base-300 py-10 sm:py-14 bg-base-100">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <div class="ns-section-eyebrow mb-2">SSS</div>
+            <h2 class="text-xl font-bold mb-6">
+                {{ $districtName }} internet hakkında sık sorulan sorular
+            </h2>
+
+            <div class="space-y-4">
+                @foreach($faqs as $faq)
+                    <details class="collapse collapse-plus ns-surface border border-base-300 rounded-xl bg-base-100">
+                        <summary class="collapse-title text-sm font-semibold">
+                            {{ $faq->question }}
+                        </summary>
+                        <div class="collapse-content text-sm text-base-content/70"> 
+                            <p>{{ $faq->answer }}</p>
+                        </div>
+                    </details>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
+
+    {{-- SEO Footer metni --}}
+    @if(!empty($meta['seo_footer']))
+    <section class="border-t border-base-300 py-10 bg-base-100">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <div class="prose prose-sm max-w-none text-base-content/65 leading-relaxed">
+                {!! nl2br(e($meta['seo_footer'])) !!}
+            </div>
+        </div>
+    </section>
+    @endif
 @endsection

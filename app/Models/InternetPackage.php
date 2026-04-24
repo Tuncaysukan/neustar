@@ -22,9 +22,14 @@ class InternetPackage extends Model
         'disadvantages',
         'is_active',
         'is_sponsored',
+        'affiliate_url',
+        'modem_included',
         'available_provinces',
         'seo_title',
         'seo_description',
+        'apply_type',
+        'external_url',
+        'call_number',
     ];
 
     protected $casts = [

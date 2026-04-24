@@ -50,6 +50,7 @@ class LocationController extends Controller
 
             'lookup'       => ['nullable', 'array'],
             'hp'           => ['nullable', 'string', 'max:0'], // honeypot — boş olmalı
+            'kvkk'         => ['required', 'accepted'],
         ]);
 
         // Aynı telefonla son 60 saniyede yeni kayıt varsa engelle (duplike submit koruması)
@@ -81,6 +82,7 @@ class LocationController extends Controller
             'status'            => 'new',
             'ip'                => $request->ip(),
             'user_agent'        => substr((string) $request->userAgent(), 0, 255),
+            'kvkk_approved_at'  => now(),
         ]);
 
         return response()->json([
@@ -196,7 +198,7 @@ class LocationController extends Controller
         $districtName = $this->humanize($district);
         $query        = $this->extractQuery($request);
 
-        // Bu il/ilçeye uygun paketleri çek (null = tüm Türkiye + bu ili içerenler)
+        // Bu il/ilçeye uygun paketleri çek
         $packages = \App\Models\InternetPackage::with('operator')
             ->where('is_active', true)
             ->where(function ($q) use ($city) {
@@ -207,14 +209,52 @@ class LocationController extends Controller
             ->orderBy('price')
             ->get();
 
-        // İlçe tarife sayfası URL'si (varsa)
+        // İlçe tarife sayfası URL'si
         $tariffDistrictUrl = route('tariffs.district', [
             'citySlug' => $city,
             'urlSlug'  => 'ucuz-' . $district . '-ev-interneti-fiyatlari',
         ]);
 
+        // ── Sayfa bazlı içerik: tariff_seo_contents tablosundan çek ──
+        $pageKey    = \App\Models\TariffSeoContent::districtKey($city, $district);
+        $seoContent = \App\Models\TariffSeoContent::where('page_key', $pageKey)->first();
+
+        // Meta: sayfa bazlı kayıt yoksa varsayılan şablondan render et
+        $meta = [];
+        if ($seoContent) {
+            $meta = [
+                'meta_title'       => $seoContent->meta_title,
+                'meta_description' => $seoContent->meta_description,
+                'h1'               => $seoContent->h1_title,
+                'intro'            => $seoContent->intro_text,
+                'seo_footer'       => $seoContent->seo_footer_text,
+            ];
+        } else {
+            $tpl = \App\Models\LocationMetaTemplate::defaultDistrict();
+            if ($tpl) {
+                $meta = $tpl->render($cityName, $city, $districtName, $district);
+            }
+        }
+
+        // SSS: sayfa bazlı varsa onları kullan, yoksa genel location SSS'leri
+        if ($seoContent && !empty($seoContent->faqs)) {
+            // JSON'dan Faq benzeri nesnelere dönüştür
+            $faqs = collect($seoContent->faqs)
+                ->filter(fn($f) => !empty($f['question']) && !empty($f['answer']))
+                ->map(fn($f) => (object) $f);
+        } else {
+            $faqs = \App\Models\Faq::where('is_active', true)
+                ->where(function ($q) {
+                    $q->where('page_type', 'location')
+                      ->orWhere('page_type', 'general');
+                })
+                ->orderBy('order')
+                ->get();
+        }
+
         return view('frontend.locations.district', compact(
-            'cityName', 'districtName', 'query', 'packages', 'tariffDistrictUrl'
+            'cityName', 'districtName', 'query', 'packages',
+            'tariffDistrictUrl', 'faqs', 'meta', 'seoContent'
         ) + ['citySlug' => $city, 'districtSlug' => $district]);
     }
 

@@ -1,0 +1,15 @@
+:root {
+    --ns-primary: #3F475F;
+    --ns-primary-content: #ffffff;
+    --ns-gray-bg: #F9F9F9;
+    --ns-border-color: #E7EDF0;
+    --ns-text-main: #0A1F24;
+}
+
+[data-theme="neustar-dark"] {
+    --ns-primary: #3F475F; /* Keep the same or adjust for dark mode */
+    --ns-primary-content: #ffffff;
+    --ns-gray-bg: #06161A;
+    --ns-border-color: #0B252B;
+    --ns-text-main: #E8FBFB;
+}

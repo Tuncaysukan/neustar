@@ -8,7 +8,7 @@
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
             <div class="max-w-3xl">
                 <nav class="ns-section-eyebrow flex items-center gap-1.5" aria-label="Breadcrumb">
-                    <a class="hover:text-base-content transition" href="{{ route('operators.index') }}">Operatörler</a>
+                    <a class="hover:text-base-content transition" href="{{ route('operators.index') }}">Markalar</a>
                     <span class="opacity-50">/</span>
                     <span class="text-base-content">{{ $operator->name }}</span>
                 </nav>
@@ -26,7 +26,6 @@
 
                 <div class="mt-6 flex flex-wrap items-center gap-2">
                     <a href="{{ route('packages.index') }}" class="btn btn-primary btn-sm">Tüm paketler</a>
-                    <a href="{{ route('compare') }}" class="btn btn-ghost btn-sm">Karşılaştır</a>
                 </div>
             </div>
         </div>
@@ -36,15 +35,15 @@
     <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             @forelse($operator->packages as $package)
-                <a href="{{ route('packages.show', $package->slug) }}"
-                   class="ns-surface ns-surface--hover p-6 group no-underline flex flex-col">
-
+                <div class="ns-surface ns-surface--hover p-6 group flex flex-col">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
                             <span class="ns-pkg-infra">{{ $package->infrastructure_type }}</span>
-                            <h3 class="mt-3 text-base font-semibold leading-snug line-clamp-2 text-base-content group-hover:text-primary transition">
-                                {{ $package->name }}
-                            </h3>
+                            <a href="{{ route('packages.show', $package->slug) }}" class="block mt-3 no-underline">
+                                <h3 class="text-base font-semibold leading-snug line-clamp-2 text-base-content group-hover:text-primary transition">
+                                    {{ $package->name }}
+                                </h3>
+                            </a>
                         </div>
                         <div class="text-right shrink-0">
                             <div class="ns-meta-label">Hız</div>
@@ -73,22 +72,32 @@
                                 <span class="text-sm font-semibold text-base-content/60">TL</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2" x-data>
-                            <button type="button"
-                                class="btn btn-sm px-3 min-w-[88px]"
-                                @click.prevent.stop="
-                                    const res = $store.compare.has({{ $package->id }})
-                                        ? ($store.compare.remove({{ $package->id }}), { ok: true, reason: 'removed' })
-                                        : $store.compare.add({{ $package->id }});
-                                    if (!res.ok && res.reason === 'limit') alert('En fazla 5 paket karşılaştırabilirsin.');
-                                "
-                                :class="$store.compare.has({{ $package->id }}) ? 'ns-btn-remove' : 'ns-btn-secondary'">
-                                <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Kıyasla'"></span>
-                            </button>
-                            <span class="btn btn-primary btn-sm">Detay</span>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('packages.show', $package->slug) }}"
+                               class="btn btn-sm btn-outline">
+                                Detay
+                            </a>
+
+                            @if(($package->apply_type ?? 'form') === 'site')
+                                <a href="{{ $package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/' }}"
+                                   target="_blank" rel="noopener noreferrer nofollow"
+                                   class="btn btn-sm btn-primary">
+                                    Başvur
+                                </a>
+                            @elseif(($package->apply_type ?? '') === 'call')
+                                <a href="tel:{{ $package->call_number }}"
+                                   class="btn btn-sm btn-primary">
+                                    Hemen Ara
+                                </a>
+                            @else
+                                <a href="{{ route('packages.apply', $package->slug) }}"
+                                   class="btn btn-sm btn-primary">
+                                    Başvur
+                                </a>
+                            @endif
                         </div>
                     </div>
-                </a>
+                </div>
             @empty
                 <div class="col-span-full rounded-xl border border-dashed border-base-300 bg-base-100 p-12 text-center">
                     <p class="text-sm text-base-content/60">
@@ -98,4 +107,37 @@
             @endforelse
         </div>
     </section>
+
+    {{-- ===== FAQ Section ===== --}}
+    @if($faqs->isNotEmpty())
+        <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <div class="ns-surface rounded-xl p-6 sm:p-8">
+                <h2 class="text-xl font-bold mb-6">Sıkça sorulan sorular</h2>
+
+                <div class="space-y-4">
+                    @foreach($faqs as $faq)
+                        <details class="collapse collapse-plus ns-surface border border-base-300 rounded-xl bg-base-100">
+                            <summary class="collapse-title text-sm font-semibold">
+                                {{ $faq->question }}
+                            </summary>
+                            <div class="collapse-content text-sm text-base-content/70"> 
+                                <p>{{ $faq->answer }}</p>
+                            </div>
+                        </details>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    {{-- ===== SEO Text Section ===== --}}
+    @if($operator->seo_text)
+        <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+            <div class="ns-surface rounded-xl p-6 sm:p-8">
+                <div class="prose prose-sm max-w-none text-base-content/70 leading-relaxed">
+                    {!! nl2br(e($operator->seo_text)) !!}
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection

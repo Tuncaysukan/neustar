@@ -25,8 +25,8 @@ export default {
             {
                 neustar: {
                     'color-scheme': 'light',
-                    primary: '#1bb6ad',
-                    'primary-content': '#eaffff',
+                    primary: '#3F475F',
+                    'primary-content': '#ffffff',
                     secondary: '#0f7f7a',
                     'secondary-content': '#eaffff',
                     accent: '#39c6b4',
@@ -34,7 +34,7 @@ export default {
                     neutral: '#0b3a44',
                     'neutral-content': '#e8fbfb',
                     'base-100': '#ffffff',
-                    'base-200': '#f6f8f9',
+                    'base-200': '#F9F9F9',
                     'base-300': '#e7edf0',
                     'base-content': '#0a1f24',
                     info: '#0ea5e9',
@@ -46,8 +46,8 @@ export default {
             {
                 'neustar-dark': {
                     'color-scheme': 'dark',
-                    primary: '#1bb6ad',
-                    'primary-content': '#031b1d',
+                    primary: '#3F475F',
+                    'primary-content': '#ffffff',
                     secondary: '#0f7f7a',
                     'secondary-content': '#eaffff',
                     accent: '#39c6b4',

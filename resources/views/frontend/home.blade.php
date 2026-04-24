@@ -251,7 +251,7 @@
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
             @foreach($latestBlogs as $blog)
-                <a href="{{ route('blog.show', $blog->slug) }}"
+                <a href="{{ route('blog.show', [$blog->categoryRel?->slug ?? 'genel', $blog->slug]) }}"
                    class="ns-surface rounded-xl overflow-hidden group transition hover:border-base-content hover:border-opacity-20">
                     <div class="relative h-44 bg-base-200">
                         @if($blog->image)
@@ -309,65 +309,4 @@
     </section>
     @endif
 
-    {{-- ====================== İletişim ====================== --}}
-    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-20 mb-20">
-        <div class="ns-surface rounded-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
-            <div class="lg:col-span-4 ns-hero p-8 sm:p-10 relative">
-                <div class="relative z-10">
-                    <div class="text-xs font-medium uppercase tracking-wider text-primary">İletişim</div>
-                    <h3 class="mt-2 text-2xl font-bold">Sorunuz mu var?</h3>
-                    <p class="mt-3 text-sm text-neutral-content/70 leading-relaxed">
-                        Tarife önerisi, teknik sorun veya iş birliği için bize yazın.
-                    </p>
-
-                    <div class="mt-8 space-y-5 text-sm">
-                        <div>
-                            <div class="text-neutral-content/50 text-xs font-medium uppercase tracking-wider">E-posta</div>
-                            <div class="mt-1 font-medium">info@neustar.com</div>
-                        </div>
-                        <div>
-                            <div class="text-neutral-content/50 text-xs font-medium uppercase tracking-wider">Telefon</div>
-                            <div class="mt-1 font-medium">0543 180 00 79</div>
-                        </div>
-                        <div class="text-xs text-neutral-content/50 leading-relaxed pt-4 border-t border-white/10">
-                            Hafta içi 09:00 – 18:00 arası müşteri hizmetleri aktif.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-8 p-8 sm:p-10 bg-base-100">
-                <form method="POST" action="{{ route('contact.store') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @csrf
-                    <div>
-                        <label class="block text-sm font-medium text-base-content/80 mb-1.5">Adınız Soyadınız</label>
-                        <input name="name" value="{{ old('name') }}" class="input input-bordered w-full rounded-md" required>
-                        @error('name') <div class="mt-1 text-xs text-error">{{ $message }}</div> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-base-content/80 mb-1.5">E-posta</label>
-                        <input name="email" type="email" value="{{ old('email') }}" class="input input-bordered w-full rounded-md" required>
-                        @error('email') <div class="mt-1 text-xs text-error">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-base-content/80 mb-1.5">Konu</label>
-                        <select name="subject" class="select select-bordered w-full rounded-md">
-                            <option value="">Genel Bilgi</option>
-                            <option @selected(old('subject')==='Tarife Önerisi')>Tarife Önerisi</option>
-                            <option @selected(old('subject')==='Teknik Sorun')>Teknik Sorun</option>
-                            <option @selected(old('subject')==='İş Ortaklığı')>İş Ortaklığı</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium text-base-content/80 mb-1.5">Mesajınız</label>
-                        <textarea name="message" rows="5" class="textarea textarea-bordered w-full rounded-md" required>{{ old('message') }}</textarea>
-                        @error('message') <div class="mt-1 text-xs text-error">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="md:col-span-2 flex justify-end">
-                        <button class="btn btn-primary px-8" type="submit">Gönder</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
 @endsection

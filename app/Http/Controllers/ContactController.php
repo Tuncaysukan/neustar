@@ -19,7 +19,10 @@ class ContactController extends Controller
             'message' => ['required', 'string', 'max:5000'],
         ]);
 
-        ContactMessage::create($validated);
+        ContactMessage::create(array_merge($validated, [
+            'ip' => $request->ip(),
+            'kvkk_approved_at' => now(),
+        ]));
 
         return back()->with('status', 'Mesajın alındı. En kısa sürede dönüş yapacağız.');
     }

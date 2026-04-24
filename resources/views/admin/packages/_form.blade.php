@@ -78,6 +78,95 @@
             </div>
         </div>
 
+        {{-- Modem --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Modem</label>
+            <select name="modem_included" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option value="" @selected(!($p->modem_included ?? ''))>Belirtilmemiş</option>
+                <option value="free" @selected(($p->modem_included ?? '') === 'free')>Ücretsiz</option>
+                <option value="paid" @selected(($p->modem_included ?? '') === 'paid')>Ücretli</option>
+            </select>
+        </div>
+
+        {{-- Başvuru Tipi ve Detayları --}}
+        <div class="border-t pt-6">
+            <h4 class="text-sm font-semibold text-gray-700 mb-4">Başvuru Tipi ve Detayları</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Başvuru Tipi <span class="text-red-500">*</span></label>
+                    <select name="apply_type" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="form" @selected(old('apply_type', $p->apply_type ?? 'form') === 'form')>Form Doldurma</option>
+                        <option value="site" @selected(old('apply_type', $p->apply_type ?? '') === 'site')>Sağlayıcının Sitesine Gönder</option>
+                        <option value="call" @selected(old('apply_type', $p->apply_type ?? '') === 'call')>Hemen Ara</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Sağlayıcı URL (Dış Link)</label>
+                    <input type="url" name="external_url" value="{{ old('external_url', $p->external_url ?? '') }}"
+                           placeholder="https://..."
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Arama Numarası</label>
+                    <input type="text" name="call_number" value="{{ old('call_number', $p->call_number ?? '') }}"
+                           placeholder="05..."
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">Seçilen tipe göre kullanıcı ilgili aksiyona yönlendirilir.</p>
+        </div>
+
+        {{-- Tarife Hakkında --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Tarife Hakkında
+                <span class="text-gray-400 font-normal text-xs ml-1">(paket detay sayfasında gösterilir)</span>
+            </label>
+            <textarea name="description" rows="6"
+                      placeholder="Örn: TurkNet altyapısı ile 1.000 Mbps eşit indirme ve yükleme hızlarıyla taahhütsüz ve gerçek sınırsız internet..."
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description', $p->description ?? '') }}</textarea>
+        </div>
+
+        {{-- Artılar / Eksiler --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Artılar
+                    <span class="text-gray-400 font-normal text-xs ml-1">(her satır ayrı madde)</span>
+                </label>
+                <textarea name="advantages" rows="5"
+                          placeholder="İlk 3 ay sabit 349 TL avantajı&#10;100 Mbps yüksek hızda internet&#10;Taahhütsüz kullanım"
+                          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('advantages', $p->advantages ?? '') }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Eksiler
+                    <span class="text-gray-400 font-normal text-xs ml-1">(her satır ayrı madde)</span>
+                </label>
+                <textarea name="disadvantages" rows="5"
+                          placeholder="12 ay taahhüt şartı&#10;Cayma durumunda indirim iadesi"
+                          class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('disadvantages', $p->disadvantages ?? '') }}</textarea>
+            </div>
+        </div>
+
+        {{-- SEO --}}
+        <div class="border-t pt-6">
+            <h4 class="text-sm font-semibold text-gray-700 mb-4">SEO (opsiyonel)</h4>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">SEO Başlığı</label>
+                    <input type="text" name="seo_title" value="{{ old('seo_title', $p->seo_title ?? '') }}"
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">SEO Açıklaması</label>
+                    <textarea name="seo_description" rows="2"
+                              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('seo_description', $p->seo_description ?? '') }}</textarea>
+                </div>
+            </div>
+        </div>
+
         {{-- Durum + Sponsor (vurgulu kutu) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">

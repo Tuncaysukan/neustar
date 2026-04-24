@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faq;
+use App\Models\Operator;
+use App\Models\InternetPackage;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
@@ -16,7 +18,9 @@ class FaqController extends Controller
 
     public function create()
     {
-        return view('admin.faqs.create');
+        $operators = Operator::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        $packages = InternetPackage::with('operator')->where('is_active', true)->orderBy('name')->get(['id', 'name', 'operator_id']);
+        return view('admin.faqs.create', compact('operators', 'packages'));
     }
 
     public function store(Request $request)
@@ -25,6 +29,7 @@ class FaqController extends Controller
             'question' => 'required|max:255',
             'answer' => 'required',
             'page_type' => 'required|string',
+            'relation_id' => 'nullable|integer',
             'is_active' => 'boolean',
             'order' => 'integer',
         ]);
@@ -36,7 +41,9 @@ class FaqController extends Controller
 
     public function edit(Faq $faq)
     {
-        return view('admin.faqs.edit', compact('faq'));
+        $operators = Operator::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        $packages = InternetPackage::with('operator')->where('is_active', true)->orderBy('name')->get(['id', 'name', 'operator_id']);
+        return view('admin.faqs.edit', compact('faq', 'operators', 'packages'));
     }
 
     public function update(Request $request, Faq $faq)
@@ -45,6 +52,7 @@ class FaqController extends Controller
             'question' => 'required|max:255',
             'answer' => 'required',
             'page_type' => 'required|string',
+            'relation_id' => 'nullable|integer',
             'is_active' => 'boolean',
             'order' => 'integer',
         ]);

@@ -13,6 +13,8 @@ class ContactMessage extends Model
         'email',
         'subject',
         'message',
+        'ip',
+        'kvkk_approved_at',
     ];
 }
 

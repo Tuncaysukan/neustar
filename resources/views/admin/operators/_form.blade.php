@@ -43,6 +43,29 @@
                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description', $o->description ?? '') }}</textarea>
         </div>
 
+        {{-- SEO Title --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700">SEO Başlık</label>
+            <input type="text" name="seo_title"
+                   value="{{ old('seo_title', $o->seo_title ?? '') }}"
+                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        {{-- SEO Description --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700">SEO Açıklama</label>
+            <input type="text" name="seo_description"
+                   value="{{ old('seo_description', $o->seo_description ?? '') }}"
+                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        {{-- SEO Text --}}
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700">SEO Metni (Sayfa altında gösterilir)</label>
+            <textarea name="seo_text" rows="6"
+                      class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('seo_text', $o->seo_text ?? '') }}</textarea>
+        </div>
+
         {{-- Logo --}}
         <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700">Marka logosu</label>

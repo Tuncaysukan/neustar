@@ -65,13 +65,31 @@
                         if (!res.ok && res.reason === 'limit') alert('En fazla 5 paket karşılaştırabilirsin.');
                     "
                     :class="$store.compare.has({{ $package->id }}) ? 'btn-error' : ''">
-                <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Kıyasla'"></span>
+                <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Karşılaştır'"></span>
             </button>
 
             <a href="{{ route('packages.show', $package->slug) }}"
-               class="btn btn-sm btn-primary">
+               class="btn btn-sm btn-outline">
                 Detay
             </a>
+
+            @if(($package->apply_type ?? 'form') === 'site')
+                <a href="{{ $package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/' }}"
+                   target="_blank" rel="noopener noreferrer nofollow"
+                   class="btn btn-sm btn-primary">
+                    Başvur
+                </a>
+            @elseif(($package->apply_type ?? '') === 'call')
+                <a href="tel:{{ $package->call_number }}"
+                   class="btn btn-sm btn-primary">
+                    Hemen Ara
+                </a>
+            @else
+                <a href="{{ route('packages.apply', $package->slug) }}"
+                   class="btn btn-sm btn-primary">
+                    Başvur
+                </a>
+            @endif
         </div>
     </div>
 

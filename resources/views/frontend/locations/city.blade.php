@@ -18,12 +18,12 @@
             <div class="mt-4 flex items-end justify-between gap-4 flex-wrap">
                 <div class="max-w-3xl">
                     <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
-                        {{ $cityName }} internet altyapı sorgulama
+                        {{ $cityName }} internet tarifeleri
                     </h1>
                     <p class="mt-3 text-sm sm:text-base text-base-content/70 leading-relaxed">
-                        Haritadan ilçene tıkla veya aşağıdaki listeden seç;
-                        {{ $cityName }} ilindeki fiber, VDSL ve ADSL
-                        altyapısını adresin için sorgula.
+                        Haritadan veya listeden ilçeni seç;
+                        {{ $cityName }} ilindeki güncel internet tarifelerini,
+                        fiyatları ve operatör kampanyalarını hemen gör.
                     </p>
                     <div class="mt-5">
                         <a href="{{ $tariffCityUrl }}"
@@ -59,7 +59,7 @@
                     </div>
                 </template>
 
-                <div class="relative bg-base-200">
+                <div class="relative" style="background-color: #ffffff;">
                     <div x-ref="map"
                          class="w-full h-[280px] sm:h-[340px] lg:h-[400px] max-h-[55vh]"
                          role="application"
@@ -67,7 +67,7 @@
 
                     {{-- Yüklenme overlay'i --}}
                     <template x-if="loading">
-                        <div class="absolute inset-0 grid place-items-center bg-base-200/80 backdrop-blur-sm pointer-events-none">
+                        <div class="absolute inset-0 grid place-items-center pointer-events-none" style="background-color: rgba(255,255,255,0.8);">
                             <div class="flex items-center gap-2 text-sm text-base-content/70">
                                 <span class="loading loading-spinner loading-sm"></span>
                                 Harita yükleniyor…
@@ -119,21 +119,22 @@
 
                 <div class="mt-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
                     @foreach($districts as $district)
-                        <div class="ns-surface ns-surface--hover flex flex-col"
-                             x-show="q.trim() === '' || '{{ mb_strtolower($district['name'], 'UTF-8') }}'.startsWith(q.trim().toLowerCase())"
-                             x-transition.opacity>
-                            {{-- Altyapı sorgulama --}}
-                            <a href="{{ url('/internet-altyapi/' . $citySlug . '/' . $district['slug']) }}"
-                               class="no-underline px-3 pt-3 pb-1 text-sm font-medium text-base-content hover:text-primary transition flex items-center justify-between gap-2">
+                        @php
+                            $tariffUrl = route('tariffs.district', [
+                                'citySlug' => $citySlug,
+                                'urlSlug'  => 'ucuz-' . $district['slug'] . '-ev-interneti-fiyatlari',
+                            ]);
+                        @endphp
+                        <a href="{{ $tariffUrl }}"
+                           class="ns-surface ns-surface--hover no-underline px-3 py-3 flex flex-col gap-1"
+                           x-show="q.trim() === '' || '{{ mb_strtolower($district['name'], 'UTF-8') }}'.startsWith(q.trim().toLowerCase())"
+                           x-transition.opacity>
+                            <span class="text-sm font-medium text-base-content hover:text-primary transition flex items-center justify-between gap-2">
                                 <span class="truncate">{{ $district['name'] }}</span>
                                 <span aria-hidden="true" class="text-base-content/30">→</span>
-                            </a>
-                            {{-- Tarife sayfası --}}
-                            <a href="{{ route('tariffs.district', ['citySlug' => $citySlug, 'urlSlug' => 'ucuz-' . $district['slug'] . '-ev-interneti-fiyatlari']) }}"
-                               class="no-underline px-3 pb-2.5 text-[11px] text-primary/70 hover:text-primary transition">
-                                Tarifeleri gör
-                            </a>
-                        </div>
+                            </span>
+                            <span class="text-[11px] text-primary/70">Tarifeleri gör</span>
+                        </a>
                     @endforeach
                 </div>
             </div>
@@ -149,9 +150,8 @@
                 en uygun tarifeyi seçebilirsiniz.
             </p>
             <p>
-                Adresinizde hangi altyapının desteklendiğini öğrenmek için
-                haritadan ilçenize tıklayın; mahalle ve sokak detayı bir sonraki
-                adımda toplanıyor.
+                Haritadan veya listeden ilçenizi seçin; o ilçeye ait güncel internet
+                tarifelerini, fiyatları ve operatör kampanyalarını hemen görün.
             </p>
         </div>
     </section>

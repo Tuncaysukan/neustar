@@ -30,6 +30,7 @@ class SeoContentController extends Controller
         ]);
 
         SeoContent::create($validated);
+        \App\Models\SeoContent::clearCache($validated['page_key']);
 
         return redirect()->route('admin.seo.index')->with('success', 'SEO içeriği başarıyla eklendi.');
     }
@@ -50,12 +51,14 @@ class SeoContentController extends Controller
         ]);
 
         $seo->update($validated);
+        \App\Models\SeoContent::clearCache($seo->page_key);
 
         return redirect()->route('admin.seo.index')->with('success', 'SEO içeriği başarıyla güncellendi.');
     }
 
     public function destroy(SeoContent $seo)
     {
+        \App\Models\SeoContent::clearCache($seo->page_key);
         $seo->delete();
         return redirect()->route('admin.seo.index')->with('success', 'SEO içeriği başarıyla silindi.');
     }

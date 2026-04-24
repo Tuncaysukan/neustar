@@ -9,15 +9,9 @@
         <div>
             <div class="ns-section-eyebrow">Altyapı Sorgulama</div>
             <h2 class="ns-section-title mt-2">Haritadan ilini seç</h2>
-            <p class="mt-3 text-sm text-base-content/70 max-w-xl">
-                Türkiye haritasındaki ile tıklayın veya adını yazın;
-                o ildeki fiber, VDSL ve ADSL altyapı detaylarına ulaşın.
-            </p>
+            {{-- Açıklama metni gizlendi --}}
         </div>
-        <div class="flex items-center gap-2 text-xs text-base-content/60">
-            <span class="inline-block h-2 w-2 rounded-full bg-primary"></span>
-            <span>81 il tıklanabilir</span>
-        </div>
+        {{-- "81 il tıklanabilir" rozeti gizlendi --}}
     </div>
 
     <div class="mt-8 ns-surface overflow-hidden" x-data="addressLookup" x-cloak>
@@ -29,8 +23,8 @@
             </div>
         </template>
 
-        {{-- Arama kutusu --}}
-        <div class="px-4 sm:px-6 py-4 border-b border-base-300 bg-base-200/40">
+        {{-- Arama kutusu — gizlendi --}}
+        <div class="hidden">
             <form @submit.prevent="submitSearch" class="flex items-center gap-3 flex-wrap">
                 <label class="ns-meta-label shrink-0">İl ara</label>
                 <div class="relative flex-1 min-w-[200px]">
@@ -61,8 +55,8 @@
             </form>
         </div>
 
-        {{-- Harita --}}
-        <div class="relative bg-base-200">
+        {{-- Harita — arka plan beyaz --}}
+        <div class="relative" style="background-color: #ffffff;">
             <div x-ref="map"
                  class="h-[420px] sm:h-[540px] lg:h-[620px] w-full"
                  role="application"
@@ -70,7 +64,7 @@
 
             {{-- Yüklenme overlay'i --}}
             <template x-if="loading">
-                <div class="absolute inset-0 grid place-items-center bg-base-200/80 backdrop-blur-sm">
+                <div class="absolute inset-0 grid place-items-center" style="background-color: rgba(255,255,255,0.8);">
                     <div class="flex items-center gap-2 text-sm text-base-content/70">
                         <span class="loading loading-spinner loading-sm"></span>
                         Harita yükleniyor…
@@ -88,8 +82,8 @@
             </template>
         </div>
 
-        {{-- Alt kaynaklar şeridi --}}
-        <div class="px-4 sm:px-6 py-3 border-t border-base-300 text-[11px] text-base-content/55 flex flex-wrap items-center gap-x-4 gap-y-1">
+        {{-- Alt kaynaklar şeridi — gizlendi --}}
+        <div class="hidden">
             <span>Harita:
                 <a href="https://github.com/alpers/Turkey-Maps-GeoJSON" target="_blank" rel="noopener"
                    class="underline underline-offset-2 hover:text-primary">Turkey-Maps-GeoJSON</a>

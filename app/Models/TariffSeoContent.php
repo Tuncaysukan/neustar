@@ -18,8 +18,13 @@ class TariffSeoContent extends Model
         'h1_title',
         'intro_text',
         'seo_footer_text',
+        'faqs',
         'meta_title',
         'meta_description',
+    ];
+
+    protected $casts = [
+        'faqs' => 'array',
     ];
 
     /**

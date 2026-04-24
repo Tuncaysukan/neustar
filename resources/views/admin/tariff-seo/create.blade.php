@@ -118,6 +118,23 @@
             </div>
         </div>
 
+        {{-- SSS --}}
+        <div class="border-t pt-6 pb-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h4 class="text-base font-bold">Sıkça Sorulan Sorular (SSS)</h4>
+                    <p class="text-xs text-gray-500 mt-0.5">Bu sayfaya özel SSS'ler. Boş bırakırsanız genel SSS'ler gösterilir.</p>
+                </div>
+                <button type="button" id="addFaq"
+                        class="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">
+                    + Soru Ekle
+                </button>
+            </div>
+            <div id="faqList" class="space-y-3">
+                <p class="text-sm text-gray-400 italic" id="emptyMsg">Henüz SSS eklenmedi.</p>
+            </div>
+        </div>
+
         <div class="flex justify-end gap-3">
             <a href="{{ route('admin.tariff-seo.index') }}"
                class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">İptal</a>
@@ -187,6 +204,48 @@
 
     // Sayfa yüklendiğinde eski değer varsa ilçeleri doldur
     if (citySelect.value) updateDistricts();
+})();
+</script>
+
+<script>
+(function () {
+    let idx = 0;
+    const list   = document.getElementById('faqList');
+    const addBtn = document.getElementById('addFaq');
+    const empty  = document.getElementById('emptyMsg');
+
+    function rowHtml(i) {
+        return `<div class="faq-row border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <div class="flex items-start gap-3">
+                <div class="flex-1 space-y-2">
+                    <input type="text" name="faqs[${i}][question]" placeholder="Soru..."
+                           class="block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <textarea name="faqs[${i}][answer]" rows="3" placeholder="Cevap..."
+                              class="block w-full border-gray-300 rounded-md shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                <button type="button" class="remove-faq text-red-500 hover:text-red-700 mt-1 shrink-0" title="Kaldır">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </div>
+        </div>`;
+    }
+
+    addBtn.addEventListener('click', function () {
+        if (empty) empty.style.display = 'none';
+        const div = document.createElement('div');
+        div.innerHTML = rowHtml(idx++);
+        list.appendChild(div.firstElementChild);
+        list.lastElementChild.querySelector('input').focus();
+    });
+
+    list.addEventListener('click', function (e) {
+        const btn = e.target.closest('.remove-faq');
+        if (!btn) return;
+        btn.closest('.faq-row').remove();
+        if (empty && !list.querySelector('.faq-row')) empty.style.display = '';
+    });
 })();
 </script>
 @endpush

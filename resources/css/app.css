@@ -1,3 +1,4 @@
+@import './variables.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -246,7 +247,28 @@
         box-shadow: 0 1px 2px rgba(10, 31, 36, 0.06);
     }
 
-    /* ---------- Package card ---------- */
+    /* ---------- Package card (horizontal) ---------- */
+    .ns-pkg-card-horizontal {
+        @apply relative bg-base-100 rounded-xl border border-base-300 transition;
+        min-height: 135px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .ns-pkg-card-horizontal > div {
+        width: 100%;
+    }
+    .ns-pkg-card-horizontal:hover {
+        border-color: rgba(10, 31, 36, 0.18);
+    }
+    [data-theme="neustar-dark"] .ns-pkg-card-horizontal:hover {
+        border-color: rgba(232, 251, 251, 0.18);
+    }
+    .ns-pkg-card-horizontal.ns-pkg-card--sponsored {
+        border-color: rgba(27, 182, 173, 0.4);
+    }
+
+    /* ---------- Package card (vertical) ---------- */
     .ns-pkg-card {
         @apply relative bg-base-100 rounded-xl p-6 border border-base-300 flex flex-col transition;
     }

@@ -12,10 +12,10 @@
                     <a href="{{ route('home') }}" class="hover:text-base-content">Anasayfa</a>
                     <span>/</span>
                     <a href="{{ route('blog.index') }}" class="hover:text-base-content">Blog</a>
-                    @if($blog->category)
+                    @if($blog->categoryRel)
                         <span>/</span>
-                        <a href="{{ route('blog.index', ['kategori' => $blog->category]) }}" class="hover:text-base-content">
-                            {{ $blog->category }}
+                        <a href="{{ route('blog.category', $blog->categoryRel->slug) }}" class="hover:text-base-content">
+                            {{ $blog->categoryRel->name }}
                         </a>
                     @endif
                 </nav>
@@ -103,9 +103,9 @@
                 {{-- Footer meta --}}
                 <div class="mt-10 pt-6 border-t border-base-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div class="flex flex-wrap items-center gap-2">
-                        @if($blog->category)
-                            <a href="{{ route('blog.index', ['kategori' => $blog->category]) }}" class="ns-tag">
-                                # {{ $blog->category }}
+                        @if($blog->categoryRel)
+                            <a href="{{ route('blog.category', $blog->categoryRel->slug) }}" class="ns-tag">
+                                # {{ $blog->categoryRel->name }}
                             </a>
                         @endif
                     </div>
@@ -144,7 +144,8 @@
 
                 <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
                     @foreach($related as $r)
-                        <a href="{{ route('blog.show', $r->slug) }}"
+                        @php $rCatSlug = $r->categoryRel->slug ?? 'genel'; @endphp
+                        <a href="{{ route('blog.show', [$rCatSlug, $r->slug]) }}"
                            class="ns-surface rounded-xl overflow-hidden group transition hover:border-base-content hover:border-opacity-20 no-underline flex flex-col">
                             <div class="relative h-40 bg-base-200">
                                 @if($r->image)
@@ -153,8 +154,8 @@
                                 @endif
                             </div>
                             <div class="p-5 flex-1 flex flex-col">
-                                @if($r->category)
-                                    <div class="text-xs font-medium text-base-content/60">{{ $r->category }}</div>
+                                @if($r->categoryRel)
+                                    <div class="text-xs font-medium text-base-content/60">{{ $r->categoryRel->name }}</div>
                                 @endif
                                 <h3 class="mt-1 text-base font-semibold leading-snug line-clamp-2">{{ $r->title }}</h3>
                                 <div class="mt-auto pt-4 flex items-center justify-between text-xs text-base-content/55">

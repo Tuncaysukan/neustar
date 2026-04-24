@@ -6,10 +6,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/hiz-testi', [\App\Http\Controllers\HomeController::class, 'speedTest'])->name('speed-test');
 Route::get('/taahhut-sayaci', [\App\Http\Controllers\HomeController::class, 'commitmentCounter'])->name('commitment-counter');
+Route::post('/taahhut-sayaci/hatirlatici', [\App\Http\Controllers\HomeController::class, 'commitmentReminderStore'])
+    ->middleware('throttle:10,1')
+    ->name('commitment-counter.reminder');
 Route::post('/iletisim', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/internet-paketleri', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages.index');
-Route::get('/internet-paketleri/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
+Route::get('/internet-paketleri/{operatorSlug}', [\App\Http\Controllers\PackageController::class, 'index'])
+    ->where('operatorSlug', '^(?!basvur|karsilastir)[a-z0-9-]+$')
+    ->name('packages.operator');
+Route::get('/internet-paketleri/{operatorSlug}/{infraSlug}', [\App\Http\Controllers\PackageController::class, 'index'])
+    ->where(['operatorSlug' => '[a-z0-9-]+', 'infraSlug' => 'fiber|vdsl|adsl|fixed-wireless'])
+    ->name('packages.operator_infra');
+Route::get('/paket/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
+Route::get('/internet-paketleri/{slug}/basvur', [\App\Http\Controllers\PackageController::class, 'apply'])->name('packages.apply');
+Route::post('/internet-paketleri/{slug}/basvur', [\App\Http\Controllers\PackageController::class, 'submitApplication'])->name('packages.apply.submit');
 
 // İl/ilçe bazlı tarife sayfaları
 // /internet-tarifeleri/ucuz-istanbul-ev-interneti-fiyatlari
@@ -22,11 +33,12 @@ Route::get('/internet-tarifeleri/{citySlug}/{urlSlug}', [\App\Http\Controllers\T
     ->name('tariffs.district');
 Route::post('/internet-paketleri/{slug}/yorum', [\App\Http\Controllers\PackageReviewController::class, 'store'])->name('packages.reviews.store');
 Route::get('/karsilastir', [\App\Http\Controllers\CompareController::class, 'index'])->name('compare');
-Route::get('/operatorler', [\App\Http\Controllers\HomeController::class, 'operators'])->name('operators.index');
-Route::get('/operatorler/{slug}', [\App\Http\Controllers\HomeController::class, 'operatorDetail'])->name('operators.show');
+Route::get('/markalar', [\App\Http\Controllers\HomeController::class, 'operators'])->name('operators.index');
+Route::get('/markalar/{slug}', [\App\Http\Controllers\HomeController::class, 'operatorDetail'])->name('operators.show');
 
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+Route::get('/blog/{categorySlug}', [\App\Http\Controllers\BlogController::class, 'categoryIndex'])->name('blog.category');
+Route::get('/blog/{categorySlug}/{slug}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 Route::middleware('throttle:120,1')->prefix('api/adres')->group(function () {
     Route::get('mahalleler/{city}/{district}', [\App\Http\Controllers\LocationController::class, 'neighborhoods'])
         ->where(['city' => '[a-z0-9-]+', 'district' => '[a-z0-9-]+'])
@@ -41,8 +53,15 @@ Route::middleware('throttle:120,1')->prefix('api/adres')->group(function () {
         ->where(['binaKodu' => '[0-9]+'])
         ->name('location.doors');
 });
-Route::get('/internet-altyapi/{city}', [\App\Http\Controllers\LocationController::class, 'city'])->name('location.city');
-Route::get('/internet-altyapi/{city}/{district}', [\App\Http\Controllers\LocationController::class, 'district'])->name('location.district');
+// /internet-altyapi/{il} → /internet-tarifeleri/ucuz-{il}-ev-interneti-fiyatlari (301)
+Route::get('/internet-altyapi/{city}', function (string $city) {
+    return redirect()->to("/internet-tarifeleri/ucuz-{$city}-ev-interneti-fiyatlari", 301);
+})->where('city', '[a-z0-9-]+')->name('location.city');
+
+// /internet-altyapi/{il}/{ilçe} → /internet-tarifeleri/{il}/ucuz-{ilçe}-ev-interneti-fiyatlari (301)
+Route::get('/internet-altyapi/{city}/{district}', function (string $city, string $district) {
+    return redirect()->to("/internet-tarifeleri/{$city}/ucuz-{$district}-ev-interneti-fiyatlari", 301);
+})->where(['city' => '[a-z0-9-]+', 'district' => '[a-z0-9-]+'])->name('location.district');
 Route::post('/altyapi-sorgu', [\App\Http\Controllers\LocationController::class, 'lookup'])
     ->middleware('throttle:60,1')
     ->name('location.lookup');
@@ -65,6 +84,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('tariff-seo', \App\Http\Controllers\Admin\TariffSeoController::class)
         ->except(['show'])
         ->parameters(['tariff-seo' => 'tariffSeo']);
+    Route::resource('location-meta', \App\Http\Controllers\Admin\LocationMetaTemplateController::class)
+        ->except(['show'])
+        ->parameters(['location-meta' => 'locationMeta']);
+    Route::post('location-meta/{locationMeta}/apply', [\App\Http\Controllers\Admin\LocationMetaTemplateController::class, 'apply'])
+        ->name('location-meta.apply');
     Route::resource('infrastructure', \App\Http\Controllers\Admin\InfrastructureStatusController::class)
         ->except(['show']);
     Route::get('infrastructure-leads', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'index'])

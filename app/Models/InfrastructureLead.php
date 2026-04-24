@@ -16,6 +16,7 @@ class InfrastructureLead extends Model
         'lookup_snapshot',
         'status', 'admin_notes',
         'ip', 'user_agent',
+        'kvkk_approved_at',
     ];
 
     protected $casts = [

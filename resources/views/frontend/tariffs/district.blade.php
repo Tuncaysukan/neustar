@@ -86,4 +86,28 @@
 </section>
 @endif
 
+{{-- ===== FAQ Section ===== --}}
+@if(!empty($seo?->faqs))
+<section class="border-t border-base-300">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
+        <h2 class="text-xl font-bold mb-8">{{ $cityName }} {{ $districtName }} İnternet Hakkında Sıkça Sorulanlar</h2>
+        
+        <div class="space-y-4">
+            @foreach($seo->faqs as $faq)
+                @if(!empty($faq['question']) && !empty($faq['answer']))
+                    <details class="collapse collapse-plus ns-surface border border-base-300 rounded-xl">
+                        <summary class="collapse-title text-sm font-semibold">
+                            {{ $faq['question'] }}
+                        </summary>
+                        <div class="collapse-content text-sm text-base-content/70"> 
+                            <p>{{ $faq['answer'] }}</p>
+                        </div>
+                    </details>
+                @endif
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 @endsection

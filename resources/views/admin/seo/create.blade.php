@@ -25,7 +25,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Sayfa İçi İçerik (SEO Metni)</label>
+                    <label class="block text-sm font-medium text-gray-700">Sayfa İçi İçerik (SEO Metni / Disclaimer)</label>
                     <textarea name="content" rows="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('content', $seo->content ?? '') }}</textarea>
                 </div>
 

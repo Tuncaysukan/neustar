@@ -9,12 +9,22 @@ use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, $operatorSlug = null, $infraSlug = null)
     {
         $query = InternetPackage::with('operator')->where('is_active', true);
 
-        // --- Operator(s) -------------------------------------------------
         $operatorIds = $this->asIntArray($request->query('operator'));
+        if ($operatorSlug) {
+            $operator = Operator::where('slug', $operatorSlug)->first();
+            if ($operator) {
+                $query->where('operator_id', $operator->id);
+                // URL slug'dan geleni filtreye dahil et
+                if (!in_array($operator->id, $operatorIds)) {
+                    $operatorIds[] = $operator->id;
+                }
+            }
+        }
+        
         if (! empty($operatorIds)) {
             $query->whereIn('operator_id', $operatorIds);
         }
@@ -25,20 +35,35 @@ class PackageController extends Controller
             $this->asStringArray($request->query('infrastructure')),
             $allowedInfras
         ));
+        
+        if ($infraSlug) {
+            $dbInfra = str_replace('-', '_', $infraSlug);
+            if (in_array($dbInfra, $allowedInfras)) {
+                $query->where('infrastructure_type', $dbInfra);
+                if (!in_array($dbInfra, $infras)) {
+                    $infras[] = $dbInfra;
+                }
+            }
+        }
+
         if (! empty($infras)) {
             $query->whereIn('infrastructure_type', $infras);
         }
 
-        // --- Speed tiers (OR'ed ranges) ---------------------------------
-        $speeds = $this->asStringArray($request->query('speed'));
+        // --- Speed (tek tek değerler) ----------------------------------
+        $speeds = $this->asIntArray($request->query('speed'));
         if (! empty($speeds)) {
-            $query->where(function ($q) use ($speeds) {
-                foreach ($speeds as $range) {
-                    if (preg_match('/^(\d+)-(\d+)$/', $range, $m)) {
-                        $q->orWhereBetween('speed', [(int) $m[1], (int) $m[2]]);
-                    }
-                }
-            });
+            $query->whereIn('speed', $speeds);
+        }
+
+        // --- Modem -------------------------------------------------------
+        $allowedModems = ['free', 'paid'];
+        $modems = array_values(array_intersect(
+            $this->asStringArray($request->query('modem')),
+            $allowedModems
+        ));
+        if (! empty($modems)) {
+            $query->whereIn('modem_included', $modems);
         }
 
         // --- Commitment --------------------------------------------------
@@ -105,6 +130,7 @@ class PackageController extends Controller
             'operator'       => $operatorIds,
             'infrastructure' => $infras,
             'speed'          => $speeds,
+            'modem'          => $modems,
             'commitment'     => $commitment,
             'price_min'      => is_numeric($priceMin) ? (float) $priceMin : null,
             'price_max'      => is_numeric($priceMax) ? (float) $priceMax : null,
@@ -114,6 +140,7 @@ class PackageController extends Controller
         $hasActiveFilter = ! empty($operatorIds)
             || ! empty($infras)
             || ! empty($speeds)
+            || ! empty($modems)
             || in_array($commitment, ['0', '1'], true)
             || $filters['price_min'] !== null
             || $filters['price_max'] !== null
@@ -140,6 +167,64 @@ class PackageController extends Controller
             ->get();
 
         return view('frontend.packages.show', compact('package', 'faqs'));
+    }
+
+    /**
+     * GET /internet-paketleri/{slug}/basvur
+     * Güzel loading/yönlendirme sayfası — operatörün sitesine gönderir.
+     */
+    public function apply($slug)
+    {
+        $package = InternetPackage::with('operator')
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        if ($package->apply_type === 'site') {
+            $target = $package->external_url ?: $package->operator->website_url;
+            if ($target) {
+                return view('frontend.packages.redirect', [
+                    'package' => $package,
+                    'target'  => $target,
+                ]);
+            }
+        }
+
+        if ($package->apply_type === 'call' && $package->call_number) {
+            return redirect()->to('tel:' . $package->call_number);
+        }
+
+        return view('frontend.packages.apply_form', compact('package'));
+    }
+
+    public function submitApplication(Request $request, $slug)
+    {
+        $package = InternetPackage::where('slug', $slug)->where('is_active', true)->firstOrFail();
+
+        $data = $request->validate([
+            'full_name' => 'required|string|max:255',
+            'email'     => 'required|email|max:255',
+            'phone'     => 'required|string|max:32',
+            'kvkk'      => 'required|accepted',
+        ]);
+
+        // We can reuse InfrastructureLead or create a new Applications table.
+        // For now, let's use InfrastructureLead or a simpler log.
+        // Actually, creating a new table might be better, but InfrastructureLead is already there and has similar fields.
+        // Let's create a simpler log or use InfrastructureLead but mark it as 'package_apply'.
+        
+        \App\Models\InfrastructureLead::create([
+            'full_name'         => $data['full_name'],
+            'email'             => $data['email'],
+            'phone'             => $data['phone'],
+            'lookup_snapshot'   => ['package_id' => $package->id, 'package_name' => $package->name, 'type' => 'direct_apply'],
+            'status'            => 'new',
+            'ip'                => $request->ip(),
+            'user_agent'        => substr((string) $request->userAgent(), 0, 255),
+            'kvkk_approved_at'  => now(),
+        ]);
+
+        return redirect()->back()->with('status', 'Başvurunuz başarıyla alındı. Uzmanlarımız sizi en kısa sürede arayacaktır.');
     }
 
     // ------------------------------------------------------------------

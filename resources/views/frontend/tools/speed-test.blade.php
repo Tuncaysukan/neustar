@@ -160,4 +160,31 @@
             </div>
         </div>
     </section>
+
+    {{-- ===== FAQ Section ===== --}}
+    @if($faqs->isNotEmpty())
+        <section class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12">
+            <div class="ns-surface rounded-xl p-6 sm:p-8">
+                <h2 class="text-xl font-bold mb-6">Sıkça sorulan sorular</h2>
+
+                <div class="divide-y divide-base-300 border-y border-base-300">
+                    @foreach($faqs as $faq)
+                        <details class="group">
+                            <summary class="cursor-pointer select-none py-4 flex items-center justify-between gap-4">
+                                <span class="text-base font-medium">{{ $faq->question }}</span>
+                                <span class="shrink-0 text-base-content/40 group-open:rotate-180 transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+                                    </svg>
+                                </span>
+                            </summary>
+                            <div class="pb-5 text-sm text-base-content/70 leading-relaxed">
+                                {{ $faq->answer }}
+                            </div>
+                        </details>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection

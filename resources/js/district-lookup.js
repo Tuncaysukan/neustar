@@ -44,7 +44,7 @@ export default function districtLookup(config = {}) {
         leadError: null,
         leadDone: false,
         leadDoneMessage: null,
-        leadForm: { fullName: '', phone: '', hp: '' },
+        leadForm: { fullName: '', phone: '+90(5__)___-____', hp: '' },
 
         // =========================================================
         //  init

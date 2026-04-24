@@ -45,10 +45,10 @@
                     Tümü
                 </a>
                 @foreach($categories as $cat)
-                    <a href="{{ route('blog.index', ['kategori' => $cat]) }}"
+                    <a href="{{ route('blog.category', $cat->slug) }}"
                        class="shrink-0 px-3 py-1 rounded-md text-sm font-medium transition no-underline
-                              {{ $category === $cat ? 'bg-base-content text-base-100' : 'text-base-content/70 hover:bg-base-200' }}">
-                        {{ $cat }}
+                              {{ (isset($category) && $category->id === $cat->id) ? 'bg-base-content text-base-100' : 'text-base-content/70 hover:bg-base-200' }}">
+                        {{ $cat->name }}
                     </a>
                 @endforeach
             </div>
@@ -61,13 +61,14 @@
             <div class="mb-8 text-sm text-base-content/65">
                 <span class="font-semibold text-base-content">“{{ $search }}”</span> için
                 <span class="font-semibold text-base-content">{{ $blogs->total() }}</span> sonuç
-                @if($category) · kategori: <span class="font-semibold">{{ $category }}</span> @endif
+                @if(isset($category)) · kategori: <span class="font-semibold">{{ $category->name }}</span> @endif
             </div>
         @endif
 
         {{-- Featured --}}
         @if($featured && ! $search)
-            <a href="{{ route('blog.show', $featured->slug) }}"
+            @php $featuredCatSlug = $featured->categoryRel->slug ?? 'genel'; @endphp
+            <a href="{{ route('blog.show', [$featuredCatSlug, $featured->slug]) }}"
                class="ns-surface rounded-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 group transition hover:border-base-content hover:border-opacity-20 no-underline">
                 <div class="lg:col-span-7 relative aspect-[16/10] lg:aspect-auto lg:min-h-[360px] bg-base-200">
                     @if($featured->image)
@@ -77,8 +78,8 @@
                 </div>
                 <div class="lg:col-span-5 p-6 sm:p-10 flex flex-col justify-between">
                     <div>
-                        @if($featured->category)
-                            <div class="text-xs font-medium text-primary">{{ $featured->category }}</div>
+                        @if($featured->categoryRel)
+                            <div class="text-xs font-medium text-primary">{{ $featured->categoryRel->name }}</div>
                         @endif
                         <h2 class="mt-2 text-xl sm:text-2xl font-bold leading-tight line-clamp-3">
                             {{ $featured->title }}
@@ -98,7 +99,8 @@
         {{-- Grid --}}
         <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             @forelse($blogs as $post)
-                <a href="{{ route('blog.show', $post->slug) }}"
+                @php $postCatSlug = $post->categoryRel->slug ?? 'genel'; @endphp
+                <a href="{{ route('blog.show', [$postCatSlug, $post->slug]) }}"
                    class="ns-surface rounded-xl overflow-hidden group transition hover:border-base-content hover:border-opacity-20 no-underline flex flex-col">
                     <div class="relative h-44 bg-base-200">
                         @if($post->image)
@@ -107,8 +109,8 @@
                         @endif
                     </div>
                     <div class="p-5 flex-1 flex flex-col">
-                        @if($post->category)
-                            <div class="text-xs font-medium text-base-content/60">{{ $post->category }}</div>
+                        @if($post->categoryRel)
+                            <div class="text-xs font-medium text-base-content/60">{{ $post->categoryRel->name }}</div>
                         @endif
                         <h3 class="mt-1 text-base font-semibold leading-snug line-clamp-2">
                             {{ $post->title }}

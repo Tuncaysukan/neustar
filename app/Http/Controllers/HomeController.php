@@ -37,12 +37,65 @@ class HomeController extends Controller
 
     public function speedTest()
     {
-        return view('frontend.tools.speed-test');
+        $faqs = Faq::where('is_active', true)
+            ->where(function ($query) {
+                $query->where('page_type', 'speed_test')
+                      ->orWhere('page_type', 'general');
+            })
+            ->orderBy('order')
+            ->get();
+        
+        return view('frontend.tools.speed-test', compact('faqs'));
     }
 
     public function commitmentCounter()
     {
-        return view('frontend.tools.commitment-counter');
+        $faqs = Faq::where('is_active', true)
+            ->where(function ($query) {
+                $query->where('page_type', 'commitment')
+                      ->orWhere('page_type', 'general');
+            })
+            ->orderBy('order')
+            ->get();
+        
+        return view('frontend.tools.commitment-counter', compact('faqs'));
+    }
+
+    public function commitmentReminderStore(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'email'      => ['nullable', 'email', 'max:160'],
+            'phone'      => ['nullable', 'string', 'max:32', 'regex:/^[0-9 +()\-]{7,}$/'],
+            'start_date' => ['required', 'date'],
+            'months'     => ['required', 'integer', 'in:12,24'],
+            'end_date'   => ['required', 'date'],
+            'remaining_days' => ['required', 'integer', 'min:0'],
+            'kvkk'       => ['required', 'accepted'],
+        ]);
+
+        // En az biri zorunlu
+        if (empty($data['email']) && empty($data['phone'])) {
+            return response()->json([
+                'ok'      => false,
+                'message' => 'E-posta veya telefon numarasından en az birini girin.',
+            ], 422);
+        }
+
+        \App\Models\CommitmentReminder::create([
+            'email'          => $data['email'] ?? null,
+            'phone'          => $data['phone'] ?? null,
+            'start_date'     => $data['start_date'],
+            'months'         => $data['months'],
+            'end_date'       => $data['end_date'],
+            'remaining_days' => $data['remaining_days'],
+            'ip'             => $request->ip(),
+            'kvkk_approved_at' => now(),
+        ]);
+
+        return response()->json([
+            'ok'      => true,
+            'message' => 'Kaydedildi! Taahhüt bitimine yakın sizi bilgilendireceğiz.',
+        ]);
     }
 
     public function operators()
@@ -54,6 +107,16 @@ class HomeController extends Controller
     public function operatorDetail($slug)
     {
         $operator = Operator::with('packages')->where('slug', $slug)->firstOrFail();
-        return view('frontend.operators.show', compact('operator'));
+        
+        $faqs = Faq::where('is_active', true)
+            ->where(function ($query) use ($operator) {
+                $query->where('page_type', 'operator')
+                      ->where('relation_id', $operator->id)
+                      ->orWhere('page_type', 'general');
+            })
+            ->orderBy('order')
+            ->get();
+        
+        return view('frontend.operators.show', compact('operator', 'faqs'));
     }
 }

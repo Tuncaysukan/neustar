@@ -5,12 +5,6 @@
  *              provinceSlug: '...',
  *              districtsGeoJsonUrl: '/data/districts/...geojson'
  *          })"> ... <div x-ref="map"></div> ... </div>
- *
- *  Davranış:
- *  - GeoJSON'u indir → Leaflet polygon katmanı çiz
- *  - Hover'da polygon vurgulanır, tooltipte ilçe adı görünür
- *  - Click'te /internet-altyapi/{il}/{ilce} sayfasına yönlendirir
- *  - Altta hafif tile (light/dark temaya göre) coğrafi bağlam verir
  * ============================================================= */
 
 import L from 'leaflet';
@@ -30,10 +24,8 @@ function slugify(str) {
 }
 
 function tileUrlForCurrentTheme() {
-    // DaisyUI tema root <html data-theme="..."> üzerinden okunur.
     const theme = document.documentElement.getAttribute('data-theme') || '';
     const dark = /dark/i.test(theme);
-    // CartoDB — atıf gerekli, rate-limit yumuşak, ücretsiz.
     return dark
         ? 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
         : 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png';
@@ -49,7 +41,7 @@ export default function cityMap(config = {}) {
 
         loading: true,
         error: null,
-        hoverDistrict: null,  // { name, slug } | null
+        hoverDistrict: null,
 
         _map: null,
         _geoLayer: null,
@@ -74,14 +66,13 @@ export default function cityMap(config = {}) {
             this._tileLayer = null;
         },
 
-        // ---- navigation -----------------------------------------
         goToDistrict(nameOrSlug) {
             const slug = slugify(nameOrSlug);
             if (!slug || !this.provinceSlug) return;
-            window.location.href = `/internet-altyapi/${this.provinceSlug}/${slug}`;
+            // Direkt tarife sayfasına yönlendir
+            window.location.href = `/internet-tarifeleri/${this.provinceSlug}/ucuz-${slug}-ev-interneti-fiyatlari`;
         },
 
-        // ---- map ------------------------------------------------
         async initMap() {
             const el = this.$refs.map;
             if (!el || this._map) return;
@@ -94,23 +85,19 @@ export default function cityMap(config = {}) {
                 dragging: true,
                 keyboard: true,
                 tap: true,
-                // Kullanıcı dünyaya zoom-out edemesin; Türkiye + ilçe detayı aralığı
                 minZoom: 4,
                 maxZoom: 13,
-                worldCopyJump: false,
-                maxBoundsViscosity: 0.9,
-                // Fractional zoom → fitBounds il sınırını kesin sığdırır,
-                // integer zoom'un yarattığı "bir tık fazla yakın" sorunu biter.
                 zoomSnap: 0.25,
                 zoomDelta: 0.5,
                 wheelPxPerZoomLevel: 80,
             });
 
-            // Layer eklemeden ÖNCE center/zoom olmak zorunda,
-            // yoksa Leaflet default (0,0 z0) kalır ve dünya görünür.
-            this._map.setView([39.0, 35.3], 6);
+            // Türkiye merkezi ile başlat
+            this._map.setView([39.5, 32.5], 6);
+            // Harita arka planını beyaz yap
+            el.style.backgroundColor = '#ffffff';
 
-            // Arka plan tile — çok silik, coğrafi bağlam için
+            // Arka plan tile
             this._tileLayer = L.tileLayer(tileUrlForCurrentTheme(), {
                 maxZoom: 18,
                 subdomains: 'abcd',
@@ -129,8 +116,9 @@ export default function cityMap(config = {}) {
             });
 
             try {
-                const res = await fetch(this.districtsGeoJsonUrl, { cache: 'force-cache' });
-                if (!res.ok) throw new Error();
+                // cache: 'no-cache' — her zaman güncel veri al
+                const res = await fetch(this.districtsGeoJsonUrl, { cache: 'no-cache' });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const geojson = await res.json();
 
                 this._geoLayer = L.geoJSON(geojson, {
@@ -142,7 +130,6 @@ export default function cityMap(config = {}) {
                     }),
                     onEachFeature: (feature, layer) => {
                         const raw = feature?.properties?.name || '';
-                        // GeoJSON'daki isimler lowercase tr; görsel etiket için Title Case yap
                         const display = raw
                             .split(/\s+/)
                             .map((w) => w.charAt(0).toLocaleUpperCase('tr') + w.slice(1))
@@ -174,42 +161,32 @@ export default function cityMap(config = {}) {
                     },
                 }).addTo(this._map);
 
-                // x-cloak / transition nedeniyle map container yükseklik 0
-                // iken initMap çağrılmış olabilir. İki frame + setTimeout ile
-                // gerçek ölçüyü aldıktan sonra fit et; ayrıca bounds'ı maxBounds
-                // olarak da ata ki kullanıcı il sınırından dışarı kayamasın.
-                const finalize = () => {
-                    if (!this._map || !this._geoLayer) return;
-                    try {
-                        const bounds = this._geoLayer.getBounds();
-                        if (!bounds.isValid()) return;
+                // fitBounds — birden fazla zamanlama ile
+                const bounds = this._geoLayer.getBounds();
+                if (bounds.isValid()) {
+                    const doFit = () => {
+                        if (!this._map) return;
                         this._map.invalidateSize();
+                        this._map.fitBounds(bounds, {
+                            padding: [20, 20],
+                            animate: false,
+                            maxZoom: 13,
+                        });
+                    };
 
-                        // Polygon'u ekranın ~%40'ına sıkıştırmak için:
-                        //   - geniş padding
-                        //   - fitZoom'dan 2.5 kademe kırp (zoomSnap: 0.25 → fractional OK)
-                        const size = this._map.getSize();
-                        const pad  = [
-                            Math.max(64, Math.round(size.x * 0.38)),
-                            Math.max(64, Math.round(size.y * 0.38)),
-                        ];
-
-                        const center     = bounds.getCenter();
-                        const fitZoom    = this._map.getBoundsZoom(bounds, false, pad);
-                        const targetZoom = Math.max(4, fitZoom - 3.5);
-
-                        this._map.setView(center, targetZoom, { animate: false });
-
-                        // Kullanıcı bir tık daha uzaklaştırabilsin, ama Türkiye'yi
-                        // komple görecek kadar değil.
-                        this._map.setMinZoom(Math.max(4, targetZoom - 0.5));
-                        this._map.setMaxBounds(bounds.pad(1.8));
-                    } catch {}
-                };
-                requestAnimationFrame(() =>
-                    requestAnimationFrame(() => setTimeout(finalize, 30)),
-                );
-            } catch {
+                    doFit();
+                    setTimeout(doFit, 150);
+                    setTimeout(() => {
+                        doFit();
+                        if (this._map) {
+                            const z = this._map.getZoom();
+                            this._map.setMinZoom(Math.max(4, z - 1));
+                            this._map.setMaxBounds(bounds.pad(1.8));
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.error('[cityMap] Harita yüklenemedi:', err);
                 this.error = 'Harita yüklenemedi — aşağıdaki listeden ilçe seçebilirsiniz.';
             } finally {
                 this.loading = false;

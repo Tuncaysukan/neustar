@@ -11,10 +11,12 @@
         'speed-asc'  => 'Hız ↑',
     ];
 
-    $speedTiers = [
-        '16-35'    => '16–35 Mbps',
-        '50-100'   => '50–100 Mbps',
-        '200-1000' => '200 Mbps +',
+    // Tek tek hız değerleri (örnek, DB'den dinamik çekilebilir)
+    $speedOptions = [
+        '16'  => '16 Mbps',
+        '35'  => '35 Mbps',
+        '50'  => '50 Mbps',
+        '100' => '100 Mbps',
     ];
 
     $infraOptions = [
@@ -28,6 +30,11 @@
         ''  => 'Farketmez',
         '0' => 'Taahhütsüz',
         '1' => 'Taahhütli',
+    ];
+
+    $modemOptions = [
+        'free' => 'Ücretsiz',
+        'paid' => 'Ücretli',
     ];
 @endphp
 
@@ -53,7 +60,8 @@
                     + count($filters['speed'])
                     + (in_array($filters['commitment'], ['0','1'], true) ? 1 : 0)
                     + (($filters['price_min'] !== null || $filters['price_max'] !== null) ? 1 : 0)
-                    + ($filters['sponsor_only'] ? 1 : 0);
+                    + ($filters['sponsor_only'] ? 1 : 0)
+                    + count($filters['modem'] ?? []);
             @endphp
             <aside class="lg:col-span-3"
                    x-data="{
@@ -62,6 +70,65 @@
                        init() {
                            const mql = window.matchMedia('(min-width: 1024px)');
                            mql.addEventListener('change', e => { this.isDesktop = e.matches; });
+                       },
+                       submitFilter(e) {
+                           let form = document.getElementById('filterForm');
+                           
+                           let operators = [];
+                           let infras = [];
+                           let speeds = [];
+                           let modems = [];
+                           
+                           form.querySelectorAll('input[type=checkbox]').forEach(el => {
+                               if (el.checked) {
+                                   if (el.name === 'operator[]') operators.push(el);
+                                   if (el.name === 'infrastructure[]') infras.push(el);
+                                   if (el.name === 'speed[]') speeds.push(el);
+                                   if (el.name === 'modem[]') modems.push(el);
+                               }
+                           });
+                           
+                           let basePath = '{{ route('packages.index') }}';
+                           let hasSlug = false;
+                           
+                           // Sadece 1 operatör seçiliyse SEO URL oluştur
+                           if (operators.length === 1) {
+                               basePath += '/' + operators[0].dataset.slug;
+                               hasSlug = true;
+                               // Eğer 1 operatör ve 1 altyapı seçiliyse
+                               if (infras.length === 1) {
+                                   let infraVal = infras[0].value;
+                                   basePath += '/' + infraVal.replace('_', '-');
+                               }
+                           }
+                           
+                           let params = new URLSearchParams();
+                           
+                           if (operators.length !== 1) {
+                               operators.forEach(op => params.append('operator[]', op.value));
+                           }
+                           
+                           if (operators.length !== 1 || infras.length !== 1) {
+                               infras.forEach(inf => params.append('infrastructure[]', inf.value));
+                           }
+                           
+                           speeds.forEach(cb => params.append('speed[]', cb.value));
+                           modems.forEach(cb => params.append('modem[]', cb.value));
+                           
+                           ['commitment', 'sponsor_only'].forEach(name => {
+                               form.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(el => {
+                                   if (el.name === name && el.checked && el.value) params.append(name, el.value);
+                               });
+                           });
+                           
+                           ['price_min', 'price_max', 'sort'].forEach(name => {
+                               form.querySelectorAll('input[type=number], input[type=hidden]').forEach(el => {
+                                   if (el.name === name && el.value) params.append(name, el.value);
+                               });
+                           });
+                           
+                           let qs = params.toString();
+                           window.location.href = qs ? basePath + '?' + qs : basePath;
                        }
                    }">
                 <div class="lg:sticky lg:top-20">
@@ -93,6 +160,8 @@
                     <form method="GET" action="{{ route('packages.index') }}" id="filterForm"
                           class="ns-surface rounded-xl"
                           x-show="isDesktop || openMobile"
+                          @change="submitFilter"
+                          @submit.prevent="submitFilter"
                           x-cloak>
                         {{-- Preserve sort across filter changes --}}
                         @if($sort !== 'featured')
@@ -117,7 +186,6 @@
                                 <label class="flex items-center gap-2.5 cursor-pointer">
                                     <input type="checkbox" name="sponsor_only" value="1"
                                            @checked($filters['sponsor_only'])
-                                           onchange="this.form.submit()"
                                            class="checkbox checkbox-sm checkbox-primary">
                                     <span class="text-sm">Sadece sponsor paketleri</span>
                                 </label>
@@ -133,9 +201,9 @@
                                         @foreach($operators as $op)
                                             <label class="flex items-center gap-2.5 cursor-pointer">
                                                 <input type="checkbox" name="operator[]" value="{{ $op->id }}"
+                                                       data-slug="{{ $op->slug }}"
                                                        @checked(in_array($op->id, $filters['operator']))
-                                                       onchange="this.form.submit()"
-                                                       class="checkbox checkbox-sm checkbox-primary">
+                                                           class="checkbox checkbox-sm checkbox-primary">
                                                 <span class="text-sm truncate">{{ $op->name }}</span>
                                             </label>
                                         @endforeach
@@ -153,7 +221,6 @@
                                         <label class="flex items-center gap-2.5 cursor-pointer">
                                             <input type="checkbox" name="infrastructure[]" value="{{ $value }}"
                                                    @checked(in_array($value, $filters['infrastructure']))
-                                                   onchange="this.form.submit()"
                                                    class="checkbox checkbox-sm checkbox-primary">
                                             <span class="text-sm">{{ $label }}</span>
                                         </label>
@@ -161,17 +228,33 @@
                                 </div>
                             </div>
 
-                            {{-- Hız --}}
+                            {{-- Hız (tek tek) --}}
                             <div class="px-5 py-4">
                                 <div class="text-xs font-semibold uppercase tracking-wider text-base-content/55 mb-3">
                                     Hız
                                 </div>
                                 <div class="space-y-2">
-                                    @foreach($speedTiers as $value => $label)
+                                    @foreach($speedOptions as $value => $label)
                                         <label class="flex items-center gap-2.5 cursor-pointer">
                                             <input type="checkbox" name="speed[]" value="{{ $value }}"
                                                    @checked(in_array($value, $filters['speed']))
-                                                   onchange="this.form.submit()"
+                                                   class="checkbox checkbox-sm checkbox-primary">
+                                            <span class="text-sm">{{ $label }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Modem --}}
+                            <div class="px-5 py-4">
+                                <div class="text-xs font-semibold uppercase tracking-wider text-base-content/55 mb-3">
+                                    Modem
+                                </div>
+                                <div class="space-y-2">
+                                    @foreach($modemOptions as $value => $label)
+                                        <label class="flex items-center gap-2.5 cursor-pointer">
+                                            <input type="checkbox" name="modem[]" value="{{ $value }}"
+                                                   @checked(in_array($value, $filters['modem'] ?? []))
                                                    class="checkbox checkbox-sm checkbox-primary">
                                             <span class="text-sm">{{ $label }}</span>
                                         </label>
@@ -189,7 +272,6 @@
                                         <label class="flex items-center gap-2.5 cursor-pointer">
                                             <input type="radio" name="commitment" value="{{ $value }}"
                                                    @checked((string) ($filters['commitment'] ?? '') === (string) $value)
-                                                   onchange="this.form.submit()"
                                                    class="radio radio-sm radio-primary">
                                             <span class="text-sm">{{ $label }}</span>
                                         </label>
@@ -266,7 +348,11 @@
                         @endforeach
 
                         @foreach($filters['speed'] as $sp)
-                            @include('frontend.packages._filter-chip', ['label' => $speedTiers[$sp] ?? $sp, 'remove' => request()->fullUrlWithQuery(['speed' => array_values(array_diff($filters['speed'], [$sp])) ?: null])])
+                            @include('frontend.packages._filter-chip', ['label' => $speedOptions[$sp] ?? ($sp . ' Mbps'), 'remove' => request()->fullUrlWithQuery(['speed' => array_values(array_diff($filters['speed'], [$sp])) ?: null])])
+                        @endforeach
+
+                        @foreach($filters['modem'] ?? [] as $md)
+                            @include('frontend.packages._filter-chip', ['label' => $modemOptions[$md] ?? $md, 'remove' => request()->fullUrlWithQuery(['modem' => array_values(array_diff($filters['modem'], [$md])) ?: null])])
                         @endforeach
 
                         @if(in_array($filters['commitment'], ['0', '1'], true))
@@ -283,79 +369,86 @@
                     </div>
                 @endif
 
-                {{-- Grid --}}
-                <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
+                {{-- Yatay Kart Listesi --}}
+                <div class="mt-6 flex flex-col gap-4">
                     @forelse($packages as $package)
-                        <article class="ns-pkg-card {{ $package->is_sponsored ? 'ns-pkg-card--sponsored' : '' }}">
-                            <div class="flex items-center justify-between gap-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <x-brand-mark :operator="$package->operator" size="md" />
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-semibold truncate">{{ $package->operator->name }}</div>
-                                        @if($package->is_sponsored)
-                                            <div class="text-xs text-primary">Sponsor</div>
-                                        @endif
+                        <article class="relative bg-base-100 rounded-xl p-4 sm:p-5 border border-base-200 hover:border-primary/40 shadow-sm transition-all duration-200 {{ $package->is_sponsored ? 'ring-1 ring-primary/20 bg-primary/[0.01]' : '' }}">
+                            
+                            {{-- Top Section: Logo, Stats, Button in ONE ROW --}}
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-base-200/80 pb-4 mb-4">
+                                
+                                {{-- Logo & Sponsor Badge --}}
+                                <div class="w-32 shrink-0 flex flex-col justify-center">
+                                    @if($package->is_sponsored)
+                                        <div class="flex items-center gap-0.5 text-base-content/40 text-[7px] font-bold uppercase tracking-widest mb-0.5">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                            Sponsor
+                                        </div>
+                                    @endif
+                                    <div class="h-10 flex items-center justify-start">
+                                        <x-brand-mark :operator="$package->operator" class="w-full h-full object-contain object-left mix-blend-multiply dark:mix-blend-normal" />
                                     </div>
                                 </div>
 
-                                @if($package->infrastructure_type)
-                                    <span class="ns-pkg-infra">{{ $package->infrastructure_type }}</span>
-                                @endif
+                                {{-- Stats --}}
+                                <div class="flex-1 flex flex-row items-center justify-between gap-2 lg:px-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-0.5">Hız</span>
+                                        <div class="flex items-baseline gap-0.5">
+                                            <span class="text-sm font-bold text-base-content">{{ $package->speed }}</span>
+                                            <span class="text-[10px] text-base-content/60">Mbps</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-0.5">Limit</span>
+                                        <span class="text-sm font-bold text-base-content">{{ $package->quota === 'Sınırsız' ? 'Limitsiz' : $package->quota }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-0.5">Taahhüt</span>
+                                        <span class="text-sm font-bold text-base-content">{{ $package->commitment_period > 0 ? $package->commitment_period.' ay' : 'Yok' }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] font-semibold text-base-content/50 uppercase tracking-wide mb-0.5">Fiyat</span>
+                                        <div class="flex items-baseline gap-0.5">
+                                            <span class="text-[15px] font-bold text-base-content">{{ number_format($package->price, 2, ',', '.') }}</span>
+                                            <span class="text-[10px] font-bold text-base-content/70">TL</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Apply Button --}}
+                                <div class="shrink-0 flex items-center">
+                                    @php
+                                        $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
+                                    @endphp
+                                    <a href="{{ $btnUrl }}" class="btn btn-primary btn-sm rounded whitespace-nowrap text-[13px] px-4 shrink-0">
+                                        Hemen başvur >
+                                    </a>
+                                </div>
                             </div>
 
-                            <a href="{{ route('packages.show', $package->slug) }}" class="block mt-5 no-underline">
-                                <h3 class="text-base font-semibold leading-snug line-clamp-2 text-base-content hover:text-primary">
-                                    {{ $package->name }}
-                                </h3>
-                            </a>
-
-                            <dl class="mt-5 grid grid-cols-3 gap-3 text-sm border-t border-base-300 pt-5">
-                                <div>
-                                    <dt class="text-base-content/55">Hız</dt>
-                                    <dd class="mt-0.5 font-semibold">{{ $package->speed }} Mbps</dd>
+                            {{-- Bottom Section: Title & Details Link --}}
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                                <div class="flex-1 pr-2">
+                                    <a href="{{ route('packages.show', $package->slug) }}" class="inline-block group">
+                                        <h3 class="text-[13px] sm:text-[14px] font-bold text-base-content group-hover:text-primary transition-colors">
+                                            {{ $package->name }}
+                                        </h3>
+                                    </a>
+                                    <p class="text-[11px] sm:text-[12px] text-base-content/60 mt-1 leading-relaxed line-clamp-2">
+                                        {{ strip_tags($package->description ?? "Taahhütsüz olarak {$package->speed} Mbps hız ve kotasız olarak sunulmaktadır. {$package->operator->name} ürünüdür.") }}
+                                    </p>
                                 </div>
-                                <div>
-                                    <dt class="text-base-content/55">Taahhüt</dt>
-                                    <dd class="mt-0.5 font-semibold">
-                                        {{ $package->commitment_period > 0 ? $package->commitment_period.' ay' : 'Yok' }}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt class="text-base-content/55">Kota</dt>
-                                    <dd class="mt-0.5 font-semibold truncate">{{ $package->quota }}</dd>
-                                </div>
-                            </dl>
-
-                            <div class="mt-auto pt-5 flex items-end justify-between gap-3">
-                                <div>
-                                    <span class="text-2xl font-bold text-base-content">
-                                        {{ number_format($package->price, 2, ',', '.') }}
-                                    </span>
-                                    <span class="text-sm text-base-content/60 ml-0.5">TL/ay</span>
-                                </div>
-
-                                <div class="flex items-center gap-2" x-data>
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline"
-                                            @click.prevent.stop="
-                                                const res = $store.compare.has({{ $package->id }})
-                                                    ? ($store.compare.remove({{ $package->id }}), { ok: true, reason: 'removed' })
-                                                    : $store.compare.add({{ $package->id }});
-                                                if (!res.ok && res.reason === 'limit') alert('En fazla 5 paket karşılaştırabilirsin.');
-                                            "
-                                            :class="$store.compare.has({{ $package->id }}) ? 'btn-error' : ''">
-                                        <span x-text="$store.compare.has({{ $package->id }}) ? 'Çıkar' : 'Kıyasla'"></span>
-                                    </button>
-
-                                    <a href="{{ route('packages.show', $package->slug) }}"
-                                       class="btn btn-sm btn-primary">
-                                        Detay
+                                <div class="shrink-0 mt-1 md:mt-0">
+                                    <a href="{{ route('packages.show', $package->slug) }}" class="inline-flex items-center gap-1 text-[11px] sm:text-[12px] font-bold text-base-content hover:text-primary transition-colors">
+                                        Tarife detayı
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                                     </a>
                                 </div>
                             </div>
                         </article>
                     @empty
-                        <div class="lg:col-span-2 xl:col-span-3 rounded-xl border border-dashed border-base-300 bg-base-100 p-12 text-center">
+                        <div class="rounded-xl border border-dashed border-base-300 bg-base-100 p-12 text-center">
                             <p class="text-sm text-base-content/60">Filtrelerinize uyan paket bulunamadı.</p>
                             <a href="{{ route('packages.index') }}" class="btn btn-sm btn-outline mt-4">
                                 Filtreleri temizle

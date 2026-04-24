@@ -23,6 +23,52 @@ function normalizeCompareIds(input) {
         .filter((v) => Number.isFinite(v) && v > 0);
 }
 
+window.maskPhone = function(el) {
+    let digits = el.value.replace(/\D/g, "");
+    
+    // Temizleme: 05 veya 905 ile başlıyorsa başını at
+    if (digits.startsWith("05")) digits = digits.substring(1);
+    else if (digits.startsWith("905")) digits = digits.substring(2);
+    
+    // Her zaman 5 ile başlamalı (eğer boş değilse)
+    if (digits.length > 0 && !digits.startsWith("5")) {
+        digits = "5" + digits;
+    }
+    
+    // Max 10 hane (5xx xxx xxxx)
+    digits = digits.substring(0, 10);
+    
+    // Eğer sadece 90 veya boşsa, tamamen boş maskeyi göster
+    if (digits.length === 0 || digits === "90") {
+        digits = "5"; 
+    }
+
+    // Maskeyi oluştur: +90(5xx)xxx-xxxx
+    let m = "+90(5";
+    
+    // (5xx) -> 1. ve 2. haneler (indis 1 ve 2)
+    let d1 = digits.substring(1, 3);
+    m += d1 + "_".repeat(2 - d1.length) + ")";
+    
+    // Orta 3 hane (indis 3, 4, 5)
+    let d2 = digits.substring(3, 6);
+    m += d2 + "_".repeat(3 - d2.length) + "-";
+    
+    // Son 4 hane (indis 6, 7, 8, 9)
+    let d3 = digits.substring(6, 10);
+    m += d3 + "_".repeat(4 - d3.length);
+    
+    el.value = m;
+    
+    // İmleci ilk boşluğa veya sona taşı
+    let cursor = m.indexOf("_");
+    if (cursor === -1) cursor = m.length;
+    
+    setTimeout(() => {
+        el.setSelectionRange(cursor, cursor);
+    }, 0);
+};
+
 document.addEventListener('alpine:init', () => {
     Alpine.store('compare', {
         max: 5,

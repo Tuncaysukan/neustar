@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faq;
 use App\Models\InternetPackage;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,14 @@ class CompareController extends Controller
             ->limit(5)
             ->get();
 
-        return view('frontend.compare.index', compact('packages'));
+        $faqs = Faq::where('is_active', true)
+            ->where(function ($query) {
+                $query->where('page_type', 'compare')
+                      ->orWhere('page_type', 'general');
+            })
+            ->orderBy('order')
+            ->get();
+
+        return view('frontend.compare.index', compact('packages', 'faqs'));
     }
 }

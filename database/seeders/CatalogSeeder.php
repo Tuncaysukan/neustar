@@ -99,6 +99,12 @@ class CatalogSeeder extends Seeder
             );
         }
 
+        // --- Blog Categories ---
+        $genelCat = \App\Models\BlogCategory::firstOrCreate(
+            ['slug' => 'genel'],
+            ['name' => 'Genel', 'is_active' => true]
+        );
+
         $blogs = [
             [
                 'title' => 'Digiturk’ten Sağlık Çalışanlarına Özel Kampanya 2026 | En Uygun İnternet + TV Paketleri',
@@ -119,12 +125,14 @@ class CatalogSeeder extends Seeder
             Blog::firstOrCreate(
                 ['slug' => $slug],
                 [
+                    'blog_category_id' => $genelCat->id,
                     'title' => $b['title'],
                     'content' => 'Bu içerik örnek (seed) amaçlı eklenmiştir. Admin panelden güncelleyebilirsiniz.',
                     'image' => $b['image'],
                     'is_active' => true,
                     'seo_title' => $b['title'],
                     'seo_description' => Str::limit('Bu içerik örnek (seed) amaçlı eklenmiştir. Admin panelden güncelleyebilirsiniz.', 155),
+                    'published_at' => now(),
                 ],
             );
         }

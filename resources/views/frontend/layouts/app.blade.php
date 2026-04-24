@@ -123,7 +123,7 @@
                                 <ul class="mt-4 space-y-2.5 text-sm text-neutral-content/70">
                                     <li><a class="hover:text-neutral-content" href="{{ route('speed-test') }}">Hız Testi</a></li>
                                     <li><a class="hover:text-neutral-content" href="{{ route('commitment-counter') }}">Taahhüt Sayacı</a></li>
-                                    <li><a class="hover:text-neutral-content" href="{{ route('blog.index') }}">Blog</a></li>
+                                    <li><a class="hover:text-neutral-content" href="{{ route('blog.index') }}">Blog Yazıları</a></li>
                                 </ul>
                             </div>
                             <div>
@@ -136,6 +136,35 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- ── Disclaimer ── --}}
+                    @php
+                        $disclaimer = \App\Models\SeoContent::forKey('footer_disclaimer');
+                    @endphp
+                    @if($disclaimer && $disclaimer->content)
+                    <div class="mt-10 rounded-xl border border-white/10 bg-white/5 p-5 sm:p-6 flex gap-4">
+                        {{-- Info ikonu --}}
+                        <div class="shrink-0 mt-0.5">
+                            <div class="h-8 w-8 rounded-full border border-primary/40 bg-primary/10 text-primary grid place-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4M12 8h.01"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="min-w-0">
+                            @if($disclaimer->title)
+                            <p class="text-xs font-bold uppercase tracking-wider text-neutral-content/90 mb-2">
+                                {{ $disclaimer->title }}
+                            </p>
+                            @endif
+                            <p class="text-xs text-neutral-content/60 leading-relaxed">
+                                {{ $disclaimer->content }}
+                            </p>
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-xs text-neutral-content/55">
                         <p>&copy; {{ date('Y') }} Neustar. Tüm hakları saklıdır.</p>

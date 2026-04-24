@@ -1,6 +1,6 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'İnternet Servis Sağlayıcıları - Neustar')
+@section('title', 'Markalar — Neustar')
 
 @section('content')
     <section class="py-12 sm:py-16">
@@ -10,9 +10,9 @@
             <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
                 <div class="max-w-2xl">
                     <div class="ns-section-eyebrow">Katalog</div>
-                    <h1 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight">Operatörler</h1>
+                    <h1 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight">Markalar</h1>
                     <p class="mt-3 text-sm sm:text-base text-base-content/70 leading-relaxed">
-                        Servis sağlayıcılarını inceleyin, paketlerini tek ekranda kıyaslayın.
+                        İnternet servis sağlayıcılarını inceleyin, paketlerini tek ekranda karşılaştırın.
                     </p>
                 </div>
                 <a href="{{ route('packages.index') }}" class="btn btn-ghost btn-sm self-start sm:self-auto">

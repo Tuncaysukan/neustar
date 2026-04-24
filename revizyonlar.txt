@@ -1,0 +1,15 @@
+1- http://127.0.0.1:8000/internet-tarifeleri/kayseri/ucuz-pinarbasi-ev-interneti-fiyatlari sss ve  seo metin alanları  
+2- Alt yapı  sorgulama => Ev İnterneti  Paket  Karşılaştırma 
+3- Anasayfada   iletişim  formu  kaldır 
+4- sitedeki  bütün cssleri  kontrol edebilecek  bir  yapı kurmak istiorum  bi  fikir ver 
+5-internet paketleri  başvur  button olsun https://www.enuygunfinans.com/internet-baglantilari/
+6- Admin  tarafında Başvuruda  Sağlayıcnın  sitesine  gönder - Hemen ara olacak - Form doldurma işlemi => Email  ,Telefon ve  Adsoyadı 
+KVKK izin bilgileri kutucuğu olmalı 
+7- http://127.0.0.1:8000/markalar/netspeed  karşılaştır  button kaldır  - Başvur ve  Detay olsun 
+8-http://127.0.0.1:8000/taahhut-sayaci  kvkk izin checkbox  ekle 
+9- kvkk  bütün chexboxlarda ip ve onay tarih ve saati loglanacak 
+10- bütün  telefon alanlardan  +90(5__) ___-____ sabit  olacak  
+11-http://127.0.0.1:8000/blog kategori  yapısı olacak  => http://127.0.0.1:8000/blog/ev-internet/digiturkten-saglik-calisanlarina-ozel-kampanya-2026-en-uygun-internet-tv-paketleri
+12-#3F475F button renk  kodu - #F9F9F gri ton 
+13- http://127.0.0.1:8000/internet-paketleri  satır genişliği  135 PX olacak 
+14 - filter göre URL  göstersin örnek : d-smart/fiber

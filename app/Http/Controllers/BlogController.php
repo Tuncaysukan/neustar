@@ -9,17 +9,16 @@ class BlogController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('kategori');
-        $search   = $request->query('q');
+        $search = $request->query('q');
 
         $featured = Blog::published()
-            ->category($category)
+            ->with('categoryRel')
             ->latest('published_at')
             ->latest('created_at')
             ->first();
 
         $blogsQuery = Blog::published()
-            ->category($category)
+            ->with('categoryRel')
             ->search($search)
             ->latest('published_at')
             ->latest('created_at');
@@ -30,19 +29,47 @@ class BlogController extends Controller
 
         $blogs = $blogsQuery->paginate(9)->withQueryString();
 
-        $categories = Blog::published()
-            ->whereNotNull('category')
-            ->select('category')
-            ->distinct()
-            ->orderBy('category')
-            ->pluck('category');
+        $categories = \App\Models\BlogCategory::where('is_active', true)->orderBy('name')->get();
 
-        return view('frontend.blog.index', compact('featured', 'blogs', 'categories', 'category', 'search'));
+        return view('frontend.blog.index', [
+            'featured'   => $featured,
+            'blogs'      => $blogs,
+            'categories' => $categories,
+            'search'     => $search,
+            'category'   => null,
+        ]);
     }
 
-    public function show(string $slug)
+    public function categoryIndex(string $categorySlug)
     {
-        $blog = Blog::published()->where('slug', $slug)->firstOrFail();
+        $category = \App\Models\BlogCategory::where('slug', $categorySlug)->where('is_active', true)->firstOrFail();
+        
+        $blogs = Blog::published()
+            ->with('categoryRel')
+            ->where('blog_category_id', $category->id)
+            ->latest('published_at')
+            ->latest('created_at')
+            ->paginate(12);
+
+        $categories = \App\Models\BlogCategory::where('is_active', true)->orderBy('name')->get();
+
+        return view('frontend.blog.index', [
+            'blogs'      => $blogs,
+            'category'   => $category,
+            'categories' => $categories,
+            'featured'   => null,
+            'search'     => null,
+        ]);
+    }
+
+    public function show(string $categorySlug, string $slug)
+    {
+        $category = \App\Models\BlogCategory::where('slug', $categorySlug)->firstOrFail();
+        $blog = Blog::published()
+            ->with('categoryRel')
+            ->where('slug', $slug)
+            ->where('blog_category_id', $category->id)
+            ->firstOrFail();
 
         // Basit görüntülenme sayacı — aynı oturumda tekrar saymaz.
         $sessionKey = "blog_viewed_{$blog->id}";
@@ -52,8 +79,9 @@ class BlogController extends Controller
         }
 
         $related = Blog::published()
+            ->with('categoryRel')
             ->where('id', '!=', $blog->id)
-            ->when($blog->category, fn ($q) => $q->where('category', $blog->category))
+            ->where('blog_category_id', $blog->blog_category_id)
             ->latest('published_at')
             ->latest('created_at')
             ->limit(3)
@@ -63,6 +91,7 @@ class BlogController extends Controller
         if ($related->count() < 3) {
             $related = $related->merge(
                 Blog::published()
+                    ->with('categoryRel')
                     ->where('id', '!=', $blog->id)
                     ->whereNotIn('id', $related->pluck('id'))
                     ->latest('published_at')

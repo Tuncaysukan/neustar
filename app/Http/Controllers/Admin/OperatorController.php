@@ -77,11 +77,14 @@ class OperatorController extends Controller
     private function validatePayload(Request $request): array
     {
         return $request->validate([
-            'name'        => 'required|string|max:255',
-            'website_url' => 'nullable|url|max:255',
-            'description' => 'nullable|string',
-            'is_active'   => 'nullable|boolean',
-            'logo_file'   => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:512',
+            'name'             => 'required|string|max:255',
+            'website_url'      => 'nullable|url|max:255',
+            'description'      => 'nullable|string',
+            'seo_title'        => 'nullable|string|max:255',
+            'seo_description'  => 'nullable|string|max:500',
+            'seo_text'         => 'nullable|string',
+            'is_active'        => 'nullable|boolean',
+            'logo_file'        => 'nullable|image|mimes:png,jpg,jpeg,webp,svg|max:512',
         ]);
     }
 

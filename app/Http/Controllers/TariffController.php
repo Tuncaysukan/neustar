@@ -70,6 +70,12 @@ class TariffController extends Controller
         // Operatörler (filtre sidebar için)
         $operators = Operator::where('is_active', true)->get();
 
+        // İlçe GeoJSON harita dosyası
+        $geojsonFile         = public_path('data/districts/' . $citySlug . '.geojson');
+        $districtsGeoJsonUrl = is_file($geojsonFile)
+            ? '/data/districts/' . $citySlug . '.geojson'
+            : null;
+
         return view('frontend.tariffs.city', compact(
             'citySlug',
             'cityName',
@@ -78,6 +84,7 @@ class TariffController extends Controller
             'operators',
             'seo',
             'urlSlug',
+            'districtsGeoJsonUrl',
         ));
     }
 

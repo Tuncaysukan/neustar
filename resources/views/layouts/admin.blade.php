@@ -38,6 +38,7 @@
                 </a>
                 <a href="{{ route('admin.seo.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.seo.*') ? 'bg-gray-700' : '' }}">SEO Yönetimi</a>
                 <a href="{{ route('admin.tariff-seo.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.tariff-seo.*') ? 'bg-gray-700' : '' }}">Tarife SEO</a>
+                <a href="{{ route('admin.location-meta.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.location-meta.*') ? 'bg-gray-700' : '' }}">Meta Şablonları</a>
                 <div class="border-t border-gray-700 mt-4">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
