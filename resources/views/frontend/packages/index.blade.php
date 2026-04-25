@@ -375,17 +375,11 @@
                         <article class="relative bg-base-100 rounded-xl p-4 sm:p-5 border border-base-200 hover:border-primary/40 shadow-sm transition-all duration-200 {{ $package->is_sponsored ? 'ring-1 ring-primary/20 bg-primary/[0.01]' : '' }}">
                             
                             {{-- Top Section: Logo, Stats, Button in ONE ROW --}}
-                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-base-200/80 pb-4 mb-4">
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-base-200/80 pb-2 mb-2 sm:pb-4 sm:mb-4">
                                 
-                                {{-- Logo & Sponsor Badge --}}
+                                {{-- Logo --}}
                                 <div class="w-32 shrink-0 flex flex-col justify-center">
-                                    @if($package->is_sponsored)
-                                        <div class="flex items-center gap-0.5 text-base-content/40 text-[7px] font-bold uppercase tracking-widest mb-0.5">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                                            Sponsor
-                                        </div>
-                                    @endif
-                                    <div class="h-10 flex items-center justify-start">
+                                    <div class="h-10 flex items-center justify-center">
                                         <x-brand-mark :operator="$package->operator" class="w-full h-full object-contain object-left mix-blend-multiply dark:mix-blend-normal" />
                                     </div>
                                 </div>
@@ -416,20 +410,11 @@
                                     </div>
                                 </div>
 
-                                {{-- Apply Button --}}
-                                <div class="shrink-0 flex items-center">
-                                    @php
-                                        $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
-                                    @endphp
-                                    <a href="{{ $btnUrl }}" class="btn btn-primary btn-sm rounded whitespace-nowrap text-[13px] px-4 shrink-0">
-                                        Hemen başvur >
-                                    </a>
-                                </div>
                             </div>
 
-                            {{-- Bottom Section: Title & Details Link --}}
+                            {{-- Bottom Section: Title & Actions --}}
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                                <div class="flex-1 pr-2">
+                                <div class="flex-1 min-w-0 pr-2">
                                     <a href="{{ route('packages.show', $package->slug) }}" class="inline-block group">
                                         <h3 class="text-[13px] sm:text-[14px] font-bold text-base-content group-hover:text-primary transition-colors">
                                             {{ $package->name }}
@@ -438,12 +423,49 @@
                                     <p class="text-[11px] sm:text-[12px] text-base-content/60 mt-1 leading-relaxed line-clamp-2">
                                         {{ strip_tags($package->description ?? "Taahhütsüz olarak {$package->speed} Mbps hız ve kotasız olarak sunulmaktadır. {$package->operator->name} ürünüdür.") }}
                                     </p>
+
+                                    <div class="mt-2 flex items-center gap-3">
+                                        <a href="{{ route('packages.show', $package->slug) }}"
+                                           class="inline-flex items-center gap-1 text-[11px] sm:text-[12px] font-bold text-[#3d87d9] hover:text-[#2f6fbf] transition-colors">
+                                            Tarife detayı
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                                        </a>
+
+                                        <div class="flex-1 flex justify-center">
+                                            <label class="inline-flex items-center gap-2 text-[12px] font-bold text-[#3d87d9] select-none cursor-pointer"
+                                                   x-data
+                                                   @click.stop
+                                                   @mousedown.stop>
+                                                <input type="checkbox"
+                                                       class="checkbox checkbox-xs border-base-300 w-[18px] h-[18px] [--chkbg:#fdee00] [--chkfg:#000]"
+                                                       :checked="$store.compare.has({{ $package->id }})"
+                                                       @change="
+                                                           const res = $store.compare.has({{ $package->id }})
+                                                               ? ($store.compare.remove({{ $package->id }}), { ok: true, reason: 'removed' })
+                                                               : $store.compare.add({{ $package->id }});
+                                                           if (!res.ok && res.reason === 'limit') {
+                                                               $event.target.checked = false;
+                                                               alert('En fazla 5 paket karşılaştırabilirsin.');
+                                                           }
+                                                       " />
+                                                <span>Karşılaştır</span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="shrink-0 mt-1 md:mt-0">
-                                    <a href="{{ route('packages.show', $package->slug) }}" class="inline-flex items-center gap-1 text-[11px] sm:text-[12px] font-bold text-base-content hover:text-primary transition-colors">
-                                        Tarife detayı
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+
+                                <div class="shrink-0 md:self-center flex flex-col items-end">
+                                    @php
+                                        $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
+                                    @endphp
+                                    <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-[160px] justify-center h-[160px] min-h-[160px] px-3 text-[13px] leading-none shrink-0 bg-[#fdee00] text-black border-0 hover:bg-[#e6d700] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+                                        Hemen başvur
                                     </a>
+                                    @if($package->is_sponsored)
+                                        <div class="mt-1 text-[12px] font-bold text-[#3d87d9] hover:text-[#2f6fbf] transition-colors text-center w-full">
+                                            Sponsor Sağlayıcı
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </article>

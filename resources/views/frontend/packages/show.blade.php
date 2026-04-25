@@ -191,7 +191,7 @@
                     {{-- Başvur CTA --}}
                     <div class="mt-6 flex flex-col sm:flex-row gap-3 pt-6 border-t border-base-300">
                         <a href="{{ route('packages.apply', $package->slug) }}"
-                           class="btn btn-primary sm:w-auto">
+                           class="btn sm:w-auto bg-[#fdee00] text-black border-0 hover:bg-[#e6d700] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
                             Hemen başvur →
                         </a>
                         @if($package->operator->website_url)
