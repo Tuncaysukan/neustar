@@ -84,11 +84,6 @@ class PackageController extends Controller
             $query->where('price', '<=', (float) $priceMax);
         }
 
-        // --- Sponsor only ------------------------------------------------
-        if ($request->query('sponsor_only') === '1') {
-            $query->where('is_sponsored', true);
-        }
-
         // --- Sort --------------------------------------------------------
         $sort = (string) $request->query('sort', 'featured');
         $allowedSort = ['featured', 'price-asc', 'price-desc', 'speed-desc', 'speed-asc'];
@@ -134,7 +129,6 @@ class PackageController extends Controller
             'commitment'     => $commitment,
             'price_min'      => is_numeric($priceMin) ? (float) $priceMin : null,
             'price_max'      => is_numeric($priceMax) ? (float) $priceMax : null,
-            'sponsor_only'   => $request->query('sponsor_only') === '1',
         ];
 
         $hasActiveFilter = ! empty($operatorIds)
@@ -144,7 +138,7 @@ class PackageController extends Controller
             || in_array($commitment, ['0', '1'], true)
             || $filters['price_min'] !== null
             || $filters['price_max'] !== null
-            || $filters['sponsor_only'];
+            ;
 
         return view('frontend.packages.index', compact(
             'packages', 'sort', 'operators', 'priceBounds', 'filters', 'hasActiveFilter'

@@ -33,13 +33,13 @@
                             @endif
                         </div>
 
-                        <div class="mt-5 rounded-md bg-base-200 border border-base-300 h-24 grid place-items-center px-4">
+                        <div class="mt-5 rounded-md bg-base-200 border border-base-300 h-24 flex items-center justify-center overflow-hidden px-3">
                             @if($operator->logo)
                                 <img src="{{ $operator->logo_url }}" alt="{{ $operator->name }} logosu"
-                                     class="max-h-14 max-w-full object-contain opacity-90 group-hover:opacity-100 transition"
+                                     class="h-full w-full object-contain opacity-90 group-hover:opacity-100 transition"
                                      loading="lazy">
                             @else
-                                <x-brand-mark :operator="$operator" size="lg" />
+                                <x-brand-mark :operator="$operator" size="lg" class="h-full w-full" />
                             @endif
                         </div>
 
@@ -52,8 +52,8 @@
                         </p>
 
                         <div class="mt-5 pt-4 border-t border-base-300 flex items-center justify-between text-sm">
-                            <span class="text-base-content/60">Paketleri gör</span>
-                            <span class="text-primary font-semibold group-hover:translate-x-0.5 transition-transform">→</span>
+                            <span class="font-semibold text-[#3d87d9]">Paketleri gör</span>
+                            <span class="text-[#3d87d9] font-semibold group-hover:translate-x-0.5 transition-transform">→</span>
                         </div>
                     </a>
                 @endforeach

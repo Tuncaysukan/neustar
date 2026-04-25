@@ -44,8 +44,8 @@
 
         {{-- ====== Header ====== --}}
         <div class="max-w-2xl">
-            <div class="ns-section-eyebrow">Liste</div>
-            <h1 class="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">İnternet Paketleri</h1>
+           
+            <h1 class="mt-2 text-2xl sm:text-3xl font-bold tracking-tight">Ev İnterneti Kampanyaları</h1>
             <p class="mt-3 text-sm sm:text-base text-base-content/65 leading-relaxed">
                 Operatör, altyapı ve fiyata göre filtrele. Aktif {{ $packages->total() }} tarife.
             </p>
@@ -60,7 +60,6 @@
                     + count($filters['speed'])
                     + (in_array($filters['commitment'], ['0','1'], true) ? 1 : 0)
                     + (($filters['price_min'] !== null || $filters['price_max'] !== null) ? 1 : 0)
-                    + ($filters['sponsor_only'] ? 1 : 0)
                     + count($filters['modem'] ?? []);
             @endphp
             <aside class="lg:col-span-3"
@@ -115,7 +114,7 @@
                            speeds.forEach(cb => params.append('speed[]', cb.value));
                            modems.forEach(cb => params.append('modem[]', cb.value));
                            
-                           ['commitment', 'sponsor_only'].forEach(name => {
+                           ['commitment'].forEach(name => {
                                form.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(el => {
                                    if (el.name === name && el.checked && el.value) params.append(name, el.value);
                                });
@@ -180,16 +179,6 @@
                         </div>
 
                         <div class="divide-y divide-base-300">
-
-                            {{-- Sponsor only --}}
-                            <div class="px-5 py-4">
-                                <label class="flex items-center gap-2.5 cursor-pointer">
-                                    <input type="checkbox" name="sponsor_only" value="1"
-                                           @checked($filters['sponsor_only'])
-                                           class="checkbox checkbox-sm checkbox-primary">
-                                    <span class="text-sm">Sadece sponsor paketleri</span>
-                                </label>
-                            </div>
 
                             {{-- Operatör --}}
                             @if($operators->isNotEmpty())
@@ -282,6 +271,21 @@
                             {{-- Fiyat --}}
                             <div class="px-5 py-4">
                                 <div class="text-xs font-semibold uppercase tracking-wider text-base-content/55 mb-3">
+                                    Başvuru tipi
+                                </div>
+                                <div class="space-y-2 mb-3">
+                                    <label class="flex items-center gap-2.5 cursor-pointer">
+                                        <input type="radio" name="frontend_mode" value="bireysel" checked
+                                               class="radio radio-sm radio-primary">
+                                        <span class="text-sm">Bireysel</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 cursor-pointer">
+                                        <input type="radio" name="frontend_mode" value="kurumsal"
+                                               class="radio radio-sm radio-primary">
+                                        <span class="text-sm">Kurumsal</span>
+                                    </label>
+                                </div>
+                                <div class="text-xs font-semibold uppercase tracking-wider text-base-content/55 mb-3">
                                     Aylık Fiyat (TL)
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -363,9 +367,6 @@
                             @include('frontend.packages._filter-chip', ['label' => ($filters['price_min'] ?? '0') . '–' . ($filters['price_max'] ?? '∞') . ' TL', 'remove' => request()->fullUrlWithQuery(['price_min' => null, 'price_max' => null])])
                         @endif
 
-                        @if($filters['sponsor_only'])
-                            @include('frontend.packages._filter-chip', ['label' => 'Sponsor', 'remove' => request()->fullUrlWithQuery(['sponsor_only' => null])])
-                        @endif
                     </div>
                 @endif
 
@@ -375,12 +376,12 @@
                         <article class="relative bg-base-100 rounded-xl p-4 sm:p-5 border border-base-200 hover:border-primary/40 shadow-sm transition-all duration-200 {{ $package->is_sponsored ? 'ring-1 ring-primary/20 bg-primary/[0.01]' : '' }}">
                             
                             {{-- Top Section: Logo, Stats, Button in ONE ROW --}}
-                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-base-200/80 pb-2 mb-2 sm:pb-4 sm:mb-4">
+                            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 sm:gap-4 border-b border-base-200/80 pb-1 mb-1 sm:pb-4 sm:mb-4">
                                 
                                 {{-- Logo --}}
                                 <div class="w-32 shrink-0 flex flex-col justify-center">
                                     <div class="h-10 flex items-center justify-center">
-                                        <x-brand-mark :operator="$package->operator" class="w-full h-full object-contain object-left mix-blend-multiply dark:mix-blend-normal" />
+                                        <x-brand-mark :operator="$package->operator" class="w-full h-full object-contain object-center mx-auto mix-blend-multiply dark:mix-blend-normal" />
                                     </div>
                                 </div>
 
@@ -454,11 +455,11 @@
                                     </div>
                                 </div>
 
-                                <div class="shrink-0 md:self-center flex flex-col items-end">
+                                <div class="shrink-0 md:self-center flex flex-col items-end w-full md:w-auto">
                                     @php
                                         $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
                                     @endphp
-                                    <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-[160px] justify-center h-[160px] min-h-[160px] px-3 text-[13px] leading-none shrink-0 bg-[#fdee00] text-black border-0 hover:bg-[#e6d700] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+                                    <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-full md:w-[160px] justify-center h-[28px] min-h-[28px] px-3 text-[13px] leading-none shrink-0 bg-[#fdee00] text-black border-0 hover:bg-[#e6d700] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
                                         Hemen başvur
                                     </a>
                                     @if($package->is_sponsored)

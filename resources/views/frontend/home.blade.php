@@ -5,7 +5,7 @@
     <section class="ns-hero">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pt-20 sm:pb-20 relative z-10">
             <div class="max-w-4xl">
-                <span class="ns-hero-kicker">İnternet tarifeleri</span>
+                
                 <h1 class="ns-hero-title mt-4 max-w-3xl">
                     Uygun Ev İnternet Paketlerini Bul! 
                 </h1>
