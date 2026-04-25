@@ -7,7 +7,7 @@
         <x-brand-mark :operator="$operator" size="lg" />
         <x-brand-mark :operator="$operator" size="sm" rounded="full" />
 
-    Sizes: xs(24) · sm(32) · md(40) · lg(56) · xl(72)
+    Sizes: xs(24) · sm(32) · md(40) · lg(56) · xl(72) · 2xl(96)
 --}}
 @props([
     'operator' => null,
@@ -23,6 +23,7 @@
         'md' => ['box' => 'h-10 w-10','text' => 'text-sm',      'pad' => 'p-1.5'],
         'lg' => ['box' => 'h-14 w-14','text' => 'text-lg',      'pad' => 'p-2'],
         'xl' => ['box' => 'h-[72px] w-[72px]', 'text' => 'text-xl', 'pad' => 'p-2.5'],
+        '2xl' => ['box' => 'h-24 w-24 sm:h-28 sm:w-28', 'text' => 'text-2xl', 'pad' => 'p-3'],
     ];
     $s = $sizeMap[$size] ?? $sizeMap['md'];
 

@@ -10,7 +10,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -56,19 +56,49 @@
                                 </svg>
                             </label>
 
-                            <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
-                                <span class="grid place-items-center h-8 w-8 rounded-md bg-neutral text-neutral-content font-bold">N</span>
-                                <span class="text-base font-semibold tracking-tight">Neustar</span>
+                            <a href="{{ route('home') }}" class="inline-flex items-center min-w-0 max-w-[min(340px,calc(100vw-6.5rem))] shrink" aria-label="Ana sayfa">
+                                <img
+                                    :src="theme === 'neustar-dark' ? @js(asset('images/netkarsil_white.png')) : @js(asset('images/logo-net-karsilastir.png'))"
+                                    src="{{ asset('images/logo-net-karsilastir.png') }}"
+                                    alt="net karşılaştır"
+                                    class="h-12 w-auto max-h-12 object-contain object-left"
+                                    width="286"
+                                    height="48"
+                                    decoding="async" />
                             </a>
                         </div>
 
                         <nav class="hidden lg:flex items-center gap-1">
-                            <a href="{{ route('home') }}" class="ns-navlink {{ request()->routeIs('home') ? 'ns-navlink-active' : '' }}">Ana Sayfa</a>
-                            <a href="{{ route('packages.index') }}" class="ns-navlink {{ request()->routeIs('packages.*') ? 'ns-navlink-active' : '' }}">Paketler</a>
-                            <a href="{{ route('operators.index') }}" class="ns-navlink {{ request()->routeIs('operators.*') ? 'ns-navlink-active' : '' }}">Markalar</a>
-                            <a href="{{ route('compare') }}" class="ns-navlink {{ request()->routeIs('compare') ? 'ns-navlink-active' : '' }}">Karşılaştır</a>
+                            @php
+                                $navPackagesActive = request()->routeIs('packages.*');
+                                $navCommitment = request()->query('commitment');
+                            @endphp
+                            <div class="dropdown dropdown-hover dropdown-bottom">
+                                <a href="{{ route('packages.index') }}" tabindex="0"
+                                   class="ns-navlink inline-flex items-center gap-1 {{ $navPackagesActive ? 'ns-navlink-active' : '' }}">
+                                    İnternet Kampanyaları
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 opacity-60 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
+                                    </svg>
+                                </a>
+                                <ul tabindex="0" class="dropdown-content z-[100] menu p-2 shadow-lg bg-base-100 rounded-box border border-base-300 w-72 max-w-[90vw]">
+                                    <li>
+                                        <a href="{{ route('packages.index', ['commitment' => '1']) }}"
+                                           class="whitespace-normal text-sm {{ $navPackagesActive && (string) $navCommitment === '1' ? 'active' : '' }}">
+                                            Taahhütlü Ev İnternet Paketleri
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('packages.index', ['commitment' => '0']) }}"
+                                           class="whitespace-normal text-sm {{ $navPackagesActive && (string) $navCommitment === '0' ? 'active' : '' }}">
+                                            Taahhütsüz Ev İnternet Paketleri
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a href="{{ route('operators.index') }}" class="ns-navlink {{ request()->routeIs('operators.*') ? 'ns-navlink-active' : '' }}">İnternet Servis Sağlayıcıları</a>
                             <a href="{{ route('speed-test') }}" class="ns-navlink {{ request()->routeIs('speed-test') ? 'ns-navlink-active' : '' }}">Hız Testi</a>
-                            <a href="{{ route('commitment-counter') }}" class="ns-navlink {{ request()->routeIs('commitment-counter') ? 'ns-navlink-active' : '' }}">Taahhüt</a>
+                            <a href="{{ route('commitment-counter') }}" class="ns-navlink {{ request()->routeIs('commitment-counter') ? 'ns-navlink-active' : '' }}">Taahhüt Sayacı</a>
                             <a href="{{ route('blog.index') }}" class="ns-navlink {{ request()->routeIs('blog.*') ? 'ns-navlink-active' : '' }}">Blog</a>
                         </nav>
 
@@ -100,10 +130,19 @@
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                         <div class="md:col-span-5">
-                            <div class="flex items-center gap-2.5">
-                                <span class="grid place-items-center h-8 w-8 rounded-md bg-primary text-primary-content font-bold">N</span>
-                                <span class="text-base font-semibold">Neustar</span>
-                            </div>
+                            <a href="{{ route('home') }}"
+                               class="inline-flex items-center max-w-[min(280px,100%)]"
+                               aria-label="Ana sayfa">
+                                <img
+                                    :src="theme === 'neustar-dark' ? @js(asset('images/netkarsil_white.png')) : @js(asset('images/netkarsil_white.png'))"
+                                    src="{{ asset('images/netkarsil_white.png') }}"
+                                    alt="{{ config('app.name', 'Neustar') }}"
+                                    class="h-8 w-auto max-h-8 sm:h-9 sm:max-h-9 object-contain object-left"
+                                    width="286"
+                                    height="48"
+                                    decoding="async"
+                                    loading="lazy" />
+                            </a>
                             <p class="mt-4 text-sm leading-relaxed text-neutral-content/70 max-w-md">
                                 İnternet paketlerini tek ekranda karşılaştır. Fiyat, hız ve taahhüt süresini yan yana gör.
                             </p>
@@ -167,8 +206,8 @@
                     @endif
 
                     <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-xs text-neutral-content/55">
-                        <p>&copy; {{ date('Y') }} Neustar. Tüm hakları saklıdır.</p>
-                        <p>Karşılaştırma platformudur. Kesin fiyatlar için operatörün sitesini ziyaret edin.</p>
+                        <p>&copy; {{ date('Y') }} Netkarsilastir.com  Tüm hakları saklıdır.</p>
+                        <p>Sitemizdeki operatör logoları ve markaları, bilgilendirme ve karşılaştırma amacıyla adil kullanım çerçevesinde sunulmaktadır. Tüm marka hakları ve mülkiyetleri ilgili kuruluşlara aittir. </p>
                     </div>
                 </div>
             </footer>
@@ -210,9 +249,15 @@
             <label for="neustar-nav" class="drawer-overlay" aria-label="Menüyü kapat"></label>
             <aside class="ns-drawer min-h-full w-[86vw] max-w-[340px] bg-base-100 flex flex-col">
                 <div class="px-5 py-4 border-b border-base-300 flex items-center justify-between">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
-                        <span class="grid place-items-center h-8 w-8 rounded-md bg-neutral text-neutral-content font-bold">N</span>
-                        <span class="text-base font-semibold">Neustar</span>
+                    <a href="{{ route('home') }}" class="inline-flex items-center min-w-0 max-w-[calc(100%-3rem)] shrink" aria-label="Ana sayfa">
+                        <img
+                            :src="theme === 'neustar-dark' ? @js(asset('images/netkarsil_white.png')) : @js(asset('images/logo-net-karsilastir.png'))"
+                            src="{{ asset('images/netkarsil_white.png') }}"
+                            alt="net karşılaştır"
+                            class="h-12 w-auto max-h-12 object-contain object-left"
+                            width="286"
+                            height="48"
+                            decoding="async" />
                     </a>
                     <label for="neustar-nav" class="btn btn-ghost btn-sm btn-square" aria-label="Kapat">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -223,9 +268,10 @@
 
                 <nav class="flex-1 px-3 py-4 overflow-y-auto">
                     @php
+                        $mCommitment = request()->query('commitment');
                         $navItems = [
                             ['route' => 'home',               'label' => 'Ana Sayfa',         'match' => 'home'],
-                            ['route' => 'packages.index',     'label' => 'Paketler',          'match' => 'packages.*'],
+                            ['route' => 'packages.index',     'label' => 'İnternet Kampanyaları', 'match' => 'packages.*'],
                             ['route' => 'operators.index',    'label' => 'Markalar',          'match' => 'operators.*'],
                             ['route' => 'compare',            'label' => 'Karşılaştır',       'match' => 'compare'],
                             ['route' => 'speed-test',         'label' => 'Hız Testi',         'match' => 'speed-test'],
@@ -238,16 +284,42 @@
                         @foreach($navItems as $item)
                             @php $active = request()->routeIs($item['match']); @endphp
                             <li class="list-none">
-                                <a href="{{ route($item['route']) }}"
-                                   class="ns-drawer-link {{ $active ? 'ns-drawer-link--active' : '' }}">
-                                    <span class="flex-1">{{ $item['label'] }}</span>
-                                    @if(!$active)
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                                             class="h-4 w-4 text-base-content/30">
-                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                                        </svg>
-                                    @endif
-                                </a>
+                                @if($item['route'] === 'packages.index')
+                                    <a href="{{ route('packages.index') }}"
+                                       class="ns-drawer-link {{ $active ? 'ns-drawer-link--active' : '' }}">
+                                        <span class="flex-1">{{ $item['label'] }}</span>
+                                        @if(!$active)
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-base-content/30">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @endif
+                                    </a>
+                                    <ul class="list-none pl-3 mt-1 mb-2 space-y-1 border-l border-base-300 ml-2">
+                                        <li>
+                                            <a href="{{ route('packages.index', ['commitment' => '1']) }}"
+                                               class="ns-drawer-link text-sm py-2 {{ $active && (string) $mCommitment === '1' ? 'ns-drawer-link--active' : '' }}">
+                                                <span class="flex-1">Taahhütlü Ev İnternet Paketleri</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('packages.index', ['commitment' => '0']) }}"
+                                               class="ns-drawer-link text-sm py-2 {{ $active && (string) $mCommitment === '0' ? 'ns-drawer-link--active' : '' }}">
+                                                <span class="flex-1">Taahhütsüz Ev İnternet Paketleri</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                @else
+                                    <a href="{{ route($item['route']) }}"
+                                       class="ns-drawer-link {{ $active ? 'ns-drawer-link--active' : '' }}">
+                                        <span class="flex-1">{{ $item['label'] }}</span>
+                                        @if(!$active)
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                                 class="h-4 w-4 text-base-content/30">
+                                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @endif
+                                    </a>
+                                @endif
                             </li>
                         @endforeach
                     </ul>

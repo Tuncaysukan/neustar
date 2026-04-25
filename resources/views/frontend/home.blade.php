@@ -4,30 +4,30 @@
     {{-- ====================== HERO (B: compact, search-led) ====================== --}}
     <section class="ns-hero">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pt-20 sm:pb-20 relative z-10">
-            <div class="max-w-2xl">
+            <div class="max-w-4xl">
                 <span class="ns-hero-kicker">İnternet tarifeleri</span>
-                <h1 class="ns-hero-title mt-4">
-                    En uygun tarifeyi bul.
+                <h1 class="ns-hero-title mt-4 max-w-3xl">
+                    Uygun Ev İnternet Paketlerini Bul! 
                 </h1>
-                <p class="mt-4 text-base sm:text-lg text-neutral-content/70 max-w-lg leading-relaxed">
-                    Operatör, altyapı ve hıza göre filtrele. Fiyatları yan yana gör.
+                <p class="mt-4 text-neutral-content/70 leading-relaxed text-base">
+                    Taahhütlü sabit fiyat mı, yoksa taahhütsüz özgürlük mü? Onlarca ev interneti paketlerini hız, bütçe ve taahhüt durumuna göre anında filtreleyin.                    Net Karşılaştırın!
                 </p>
             </div>
 
             {{-- Search bar: 3 inputs + submit, filling the width below the title --}}
-            <form action="{{ route('packages.index') }}" method="GET" class="mt-10">
+             <form action="{{ route('packages.index') }}" method="GET" class="mt-10">
                 <div class="ns-searchbar">
                     <div class="grid grid-cols-1 md:grid-cols-12 items-stretch md:divide-x md:divide-base-300">
                         <div class="md:col-span-4 ns-searchfield">
                             <span class="ns-searchlabel">Operatör</span>
                             <div class="relative">
-                                <select name="operator" class="ns-searchselect pr-8">
+                                <select name="operator" class="ns-searchselect pr-7">
                                     <option value="">Tümü</option>
                                     @foreach($operators as $op)
                                         <option value="{{ $op->id }}">{{ $op->name }}</option>
                                     @endforeach
                                 </select>
-                                <span class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-base-content/40">
+                                <span class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-base-content/40" aria-hidden="true">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
                                     </svg>
@@ -38,13 +38,13 @@
                         <div class="md:col-span-3 ns-searchfield">
                             <span class="ns-searchlabel">Altyapı</span>
                             <div class="relative">
-                                <select name="infrastructure" class="ns-searchselect pr-8">
+                                <select name="infrastructure" class="ns-searchselect pr-7">
                                     <option value="">Farketmez</option>
                                     <option value="fiber">Fiber</option>
                                     <option value="vdsl">VDSL</option>
                                     <option value="adsl">ADSL</option>
                                 </select>
-                                <span class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-base-content/40">
+                                <span class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-base-content/40" aria-hidden="true">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
                                     </svg>
@@ -55,13 +55,13 @@
                         <div class="md:col-span-3 ns-searchfield">
                             <span class="ns-searchlabel">Hız</span>
                             <div class="relative">
-                                <select name="speed" class="ns-searchselect pr-8">
+                                <select name="speed" class="ns-searchselect pr-7">
                                     <option value="">Tüm hızlar</option>
                                     <option value="16-35">16–35 Mbps</option>
                                     <option value="50-100">50–100 Mbps</option>
                                     <option value="200-1000">200 Mbps ve üzeri</option>
                                 </select>
-                                <span class="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-base-content/40">
+                                <span class="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-base-content/40" aria-hidden="true">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.7a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clip-rule="evenodd" />
                                     </svg>
@@ -70,21 +70,20 @@
                         </div>
 
                         <div class="md:col-span-2 p-2">
-                            <button type="submit" class="btn btn-primary w-full h-full">
+                            <button type="submit" class="btn ns-btn-tarifeler w-full h-full min-h-12 md:min-h-0">
                                 Tarifeleri Gör
                             </button>
                         </div>
                     </div>
                 </div>
-            </form>
+            </form> 
         </div>
     </section>
 
-    {{-- ====================== Stats + Operators (merged strip) ====================== --}}
+    {{-- ====================== İstatistik + operatör logoları (marquee) ====================== --}}
     <section class="bg-base-100 border-b border-base-300">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
             <div class="flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-8">
-
                 <div class="flex items-center gap-8 shrink-0">
                     <div>
                         <div class="text-xl font-bold text-base-content">
@@ -102,16 +101,29 @@
                 </div>
 
                 @if($operators->count() > 0)
-                    <div class="hidden lg:block h-8 w-px bg-base-300"></div>
-                    <div class="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-                        @foreach($operators as $op)
-                            <a href="{{ route('operators.show', $op->slug) }}"
-                               class="ns-logo-chip inline-flex items-center gap-2"
-                               title="{{ $op->name }}">
-                                <x-brand-mark :operator="$op" size="xs" />
-                                <span>{{ $op->name }}</span>
-                            </a>
-                        @endforeach
+                    <div class="hidden lg:block h-8 w-px bg-base-300 shrink-0"></div>
+                    <div class="ns-operator-marquee-wrap flex-1 min-w-0 -mx-1">
+                        <div class="ns-operator-marquee-track" aria-label="İnternet servis sağlayıcıları">
+                            <div class="flex items-center gap-4 sm:gap-6 shrink-0 pr-4 sm:pr-6">
+                                @foreach($operators as $op)
+                                    <a href="{{ route('operators.show', $op->slug) }}"
+                                       class="ns-operator-marquee-brand"
+                                       title="{{ $op->name }}"
+                                       aria-label="{{ $op->name }}">
+                                        <x-brand-mark :operator="$op" size="2xl" />
+                                    </a>
+                                @endforeach
+                            </div>
+                            <div class="flex items-center gap-4 sm:gap-6 shrink-0 pr-4 sm:pr-6" aria-hidden="true">
+                                @foreach($operators as $op)
+                                    <a href="{{ route('operators.show', $op->slug) }}"
+                                       class="ns-operator-marquee-brand"
+                                       tabindex="-1">
+                                        <x-brand-mark :operator="$op" size="2xl" />
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 @endif
             </div>
@@ -130,9 +142,9 @@
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-base font-semibold">Hız Testi</div>
+                        <div class="text-base font-semibold">İnternet Hız Testi</div>
                         <p class="mt-1 text-sm text-base-content/65 leading-relaxed">
-                            İndirme ve yükleme hızını ölç, paketinden aldığın gerçek değeri gör.
+                        Ödediğiniz paranın karşılığını gerçekten alıyor musunuz? Hemen hız testi yapın ve paketinizdeki vaat edilen hız ile evinizdeki gerçek performansı yan yana görün.
                         </p>
                         <div class="mt-4 text-sm font-medium text-primary">
                             Teste başla →
@@ -150,9 +162,9 @@
                         </svg>
                     </div>
                     <div class="min-w-0">
-                        <div class="text-base font-semibold">Altyapı Sorgula</div>
+                        <div class="text-base font-semibold">Ev İnterneti Paketlerini Karşılaştır</div>
                         <p class="mt-1 text-sm text-base-content/65 leading-relaxed">
-                            Adresinde fiber, VDSL veya ADSL var mı? Maksimum alınabilir hızı öğren.
+                        "En uygun ev interneti hangi operatörde?" sorusuna saatlerce yanıt aramaktan yoruldun mu? Net Karşılaştır ile yüzlerce tarife arasından bütçene en uygun olanı bulmak artık çok kolay.
                         </p>
                         <div class="mt-4 text-sm font-medium text-primary">
                             Sorgula →
@@ -164,13 +176,13 @@
     </section>
 
     {{-- ====================== Öne Çıkan Paketler ====================== --}}
-    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-20">
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-0 sm:mt-20">
         <div class="flex items-end justify-between gap-4 flex-wrap">
             <div>
                 <div class="ns-section-eyebrow">Öne çıkan paketler</div>
                 <h2 class="ns-section-title mt-2">Editörün seçtikleri</h2>
             </div>
-            <a href="{{ route('packages.index') }}" class="text-sm font-medium text-primary">
+            <a href="{{ route('packages.index') }}" class="text-sm font-medium text-[#489af1] transition-colors group-hover:text-[#3d87d9]">
                 Tüm paketler →
             </a>
         </div>
@@ -181,7 +193,7 @@
                    class="ns-offer p-6 block group">
                     <div class="flex items-center justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0">
-                            <x-brand-mark :operator="$package->operator" size="md" />
+                            <x-brand-mark :operator="$package->operator" size="xl" />
                             <div class="min-w-0">
                                 <div class="text-sm font-semibold text-base-content truncate">
                                     {{ $package->operator->name }}
@@ -221,7 +233,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 text-sm font-medium text-primary">
+                    <div class="mt-5 text-sm font-semibold text-[#489af1] transition-colors group-hover:text-[#3d87d9]">
                         İncele →
                     </div>
                 </a>

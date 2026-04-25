@@ -14,7 +14,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+        font-family: Roboto, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         font-variant-numeric: tabular-nums;
@@ -87,7 +87,7 @@
     /* ---------- Hero ---------- */
     .ns-hero {
         @apply relative overflow-hidden text-neutral-content;
-        background: #062c33;
+        background: #3f475f;
     }
     .ns-hero::before {
         content: "";
@@ -105,8 +105,8 @@
     .ns-hero-title {
         font-family: inherit;
         font-weight: 800;
-        font-size: clamp(2rem, 3.5vw + 1rem, 3.5rem);
-        line-height: 1.05;
+        font-size: 2.2rem;
+        line-height: 1.1;
         letter-spacing: -0.025em;
     }
 
@@ -120,9 +120,28 @@
     .ns-searchlabel {
         @apply block text-xs font-semibold uppercase tracking-wider text-base-content text-opacity-60;
     }
-    .ns-searchselect {
+    /* Tek ok: @tailwindcss/forms select’e kendi SVG’sini ekler; bizim chevron ile çiftlenmesin */
+    select.ns-searchselect {
         @apply w-full bg-transparent border-0 p-0 mt-1 text-base font-semibold text-base-content focus:outline-none focus:ring-0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
         appearance: none;
+        background-image: none !important;
+        background-position: initial;
+        background-repeat: no-repeat;
+    }
+    select.ns-searchselect::-ms-expand {
+        display: none;
+    }
+
+    /* Hero — Tarifeleri Gör */
+    .ns-btn-tarifeler {
+        background-color: #ffe802 !important;
+        color: #000000 !important;
+        border-color: transparent !important;
+    }
+    .ns-btn-tarifeler:hover {
+        filter: brightness(0.94);
     }
 
     /* ---------- Nav ---------- */
@@ -149,7 +168,8 @@
 
     /* ---------- Footer ---------- */
     .ns-footer {
-        @apply bg-neutral text-neutral-content;
+        background-color: #3f475f;
+        @apply text-neutral-content;
     }
 
     /* ---------- Section header ---------- */
@@ -183,10 +203,27 @@
         border-color: rgba(232, 251, 251, 0.18);
     }
 
-    /* ---------- Operator strip (replace marquee with static row) ---------- */
+    /* ---------- Operator strip + marquee ---------- */
     .ns-logo-chip {
         @apply inline-flex items-center gap-2 pl-1.5 pr-3.5 h-10 rounded-md border border-base-300 bg-base-100 text-sm font-medium text-base-content text-opacity-80 no-underline transition;
         white-space: nowrap;
+    }
+    /* Tek çerçeve: sadece dış kutu; logo/avatar iç border’sız */
+    .ns-operator-marquee-brand {
+        @apply inline-flex items-center justify-center shrink-0 rounded-xl border border-base-300 bg-base-100 p-2.5 sm:p-3.5 no-underline transition;
+    }
+    .ns-operator-marquee-brand:hover {
+        border-color: rgba(10, 31, 36, 0.18);
+    }
+    [data-theme="neustar-dark"] .ns-operator-marquee-brand:hover {
+        border-color: rgba(232, 251, 251, 0.18);
+    }
+    .ns-operator-marquee-brand :where(img, span[role="img"]) {
+        border-width: 0 !important;
+        box-shadow: none;
+    }
+    .ns-operator-marquee-brand img {
+        @apply bg-transparent;
     }
     .ns-logo-chip:hover {
         @apply text-opacity-100;
@@ -194,6 +231,44 @@
     }
     [data-theme="neustar-dark"] .ns-logo-chip:hover {
         border-color: rgba(232, 251, 251, 0.18);
+    }
+
+    .ns-operator-marquee-wrap {
+        overflow: hidden;
+        mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    }
+    .ns-operator-marquee-track {
+        display: flex;
+        width: max-content;
+        animation: ns-operator-marquee 55s linear infinite;
+    }
+    .ns-operator-marquee-track:hover {
+        animation-play-state: paused;
+    }
+    @keyframes ns-operator-marquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .ns-operator-marquee-track {
+            animation: none;
+            flex-wrap: wrap;
+            width: 100%;
+            justify-content: center;
+            row-gap: 0.75rem;
+        }
+        .ns-operator-marquee-wrap {
+            mask-image: none;
+            -webkit-mask-image: none;
+        }
+        .ns-operator-marquee-track > div[aria-hidden="true"] {
+            display: none;
+        }
     }
 
     /* ---------- Mobile drawer ---------- */
@@ -397,6 +472,12 @@
         background: transparent;
         font-family: inherit;
         outline: none;
+    }
+    /* Ana sayfa TR haritası: mobilde yanlış genişlik / kayma önleme */
+    .ns-turkey-map.leaflet-container {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100%;
     }
     .leaflet-control-zoom a {
         background: hsl(var(--b1));

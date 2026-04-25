@@ -16,13 +16,31 @@ class SeoContent extends Model
     ];
 
     /**
-     * page_key'e göre içerik getir — 1 saat cache.
+     * page_key'e göre içerik getir. Yalnızca id cache'lenir; model her istekte DB'den okunur.
      */
     public static function forKey(string $key): ?self
     {
-        return Cache::remember("seo_content:{$key}", 3600, function () use ($key) {
-            return static::where('page_key', $key)->first();
-        });
+        $cacheKey = "seo_content:id:{$key}";
+
+        if (! Cache::has($cacheKey)) {
+            $id = static::query()->where('page_key', $key)->value('id');
+            if ($id !== null) {
+                Cache::put($cacheKey, $id, 3600);
+            }
+
+            return $id !== null ? static::query()->find($id) : null;
+        }
+
+        $id = Cache::get($cacheKey);
+        $model = static::query()->find($id);
+
+        if ($model === null) {
+            Cache::forget($cacheKey);
+
+            return null;
+        }
+
+        return $model;
     }
 
     /**
@@ -31,5 +49,6 @@ class SeoContent extends Model
     public static function clearCache(string $key): void
     {
         Cache::forget("seo_content:{$key}");
+        Cache::forget("seo_content:id:{$key}");
     }
 }

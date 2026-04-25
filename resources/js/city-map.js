@@ -94,8 +94,7 @@ export default function cityMap(config = {}) {
 
             // Türkiye merkezi ile başlat
             this._map.setView([39.5, 32.5], 6);
-            // Harita arka planını beyaz yap
-            el.style.backgroundColor = '#ffffff';
+            el.style.backgroundColor = 'rgb(248 248 248)';
 
             // Arka plan tile
             this._tileLayer = L.tileLayer(tileUrlForCurrentTheme(), {
