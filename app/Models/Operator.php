@@ -29,6 +29,17 @@ class Operator extends Model
         return $this->hasMany(InternetPackage::class);
     }
 
+    public function logos()
+    {
+        return $this->hasMany(OperatorLogo::class)->orderBy('order');
+    }
+
+    public function primaryLogo(): ?OperatorLogo
+    {
+        return $this->logos->firstWhere('is_primary', true)
+            ?? $this->logos->first();
+    }
+
     /**
      * Normalized logo URL — handles three cases:
      *   1. External absolute URL stored in DB (https://…)

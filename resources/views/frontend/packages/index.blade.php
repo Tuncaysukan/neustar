@@ -66,68 +66,48 @@
                    x-data="{
                        isDesktop: window.matchMedia('(min-width: 1024px)').matches,
                        openMobile: false,
+                       _debounce: null,
                        init() {
                            const mql = window.matchMedia('(min-width: 1024px)');
                            mql.addEventListener('change', e => { this.isDesktop = e.matches; });
                        },
-                       submitFilter(e) {
+                       buildUrl() {
                            let form = document.getElementById('filterForm');
-                           
-                           let operators = [];
-                           let infras = [];
-                           let speeds = [];
-                           let modems = [];
-                           
-                           form.querySelectorAll('input[type=checkbox]').forEach(el => {
-                               if (el.checked) {
-                                   if (el.name === 'operator[]') operators.push(el);
-                                   if (el.name === 'infrastructure[]') infras.push(el);
-                                   if (el.name === 'speed[]') speeds.push(el);
-                                   if (el.name === 'modem[]') modems.push(el);
-                               }
-                           });
-                           
-                           let basePath = '{{ route('packages.index') }}';
-                           let hasSlug = false;
-                           
-                           // Sadece 1 operatör seçiliyse SEO URL oluştur
-                           if (operators.length === 1) {
-                               basePath += '/' + operators[0].dataset.slug;
-                               hasSlug = true;
-                               // Eğer 1 operatör ve 1 altyapı seçiliyse
-                               if (infras.length === 1) {
-                                   let infraVal = infras[0].value;
-                                   basePath += '/' + infraVal.replace('_', '-');
-                               }
-                           }
-                           
                            let params = new URLSearchParams();
-                           
-                           if (operators.length !== 1) {
-                               operators.forEach(op => params.append('operator[]', op.value));
-                           }
-                           
-                           if (operators.length !== 1 || infras.length !== 1) {
-                               infras.forEach(inf => params.append('infrastructure[]', inf.value));
-                           }
-                           
-                           speeds.forEach(cb => params.append('speed[]', cb.value));
-                           modems.forEach(cb => params.append('modem[]', cb.value));
-                           
-                           ['commitment'].forEach(name => {
-                               form.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(el => {
-                                   if (el.name === name && el.checked && el.value) params.append(name, el.value);
-                               });
-                           });
-                           
-                           ['price_min', 'price_max', 'sort'].forEach(name => {
-                               form.querySelectorAll('input[type=number], input[type=hidden]').forEach(el => {
-                                   if (el.name === name && el.value) params.append(name, el.value);
-                               });
-                           });
-                           
+
+                           form.querySelectorAll('input[name=\'operator[]\']:checked').forEach(el => params.append('operator[]', el.value));
+                           form.querySelectorAll('input[name=\'infrastructure[]\']:checked').forEach(el => params.append('infrastructure[]', el.value));
+                           form.querySelectorAll('input[name=\'speed[]\']:checked').forEach(el => params.append('speed[]', el.value));
+                           form.querySelectorAll('input[name=\'modem[]\']:checked').forEach(el => params.append('modem[]', el.value));
+
+                           let commitment = form.querySelector('input[name=commitment]:checked');
+                           if (commitment && commitment.value) params.append('commitment', commitment.value);
+
+                           let priceMin = form.querySelector('input[name=price_min]');
+                           let priceMax = form.querySelector('input[name=price_max]');
+                           if (priceMin && priceMin.value) params.append('price_min', priceMin.value);
+                           if (priceMax && priceMax.value) params.append('price_max', priceMax.value);
+
+                           let sort = form.querySelector('input[name=sort]');
+                           if (sort && sort.value && sort.value !== 'featured') params.append('sort', sort.value);
+
+                           let base = '{{ route('packages.index') }}';
                            let qs = params.toString();
-                           window.location.href = qs ? basePath + '?' + qs : basePath;
+                           return qs ? base + '?' + qs : base;
+                       },
+                       onFilterChange() {
+                           let url = this.buildUrl();
+                           // URL bar'ı anında güncelle (sayfa yenilenmez)
+                           window.history.pushState({}, '', url);
+                           // 400ms debounce ile sayfayı yenile
+                           clearTimeout(this._debounce);
+                           this._debounce = setTimeout(() => {
+                               window.location.href = url;
+                           }, 400);
+                       },
+                       submitFilter(e) {
+                           clearTimeout(this._debounce);
+                           window.location.href = this.buildUrl();
                        }
                    }">
                 <div class="lg:sticky lg:top-20">
@@ -159,7 +139,7 @@
                     <form method="GET" action="{{ route('packages.index') }}" id="filterForm"
                           class="ns-surface rounded-xl"
                           x-show="isDesktop || openMobile"
-                          @change="submitFilter"
+                          @change="onFilterChange()"
                           @submit.prevent="submitFilter"
                           x-cloak>
                         {{-- Preserve sort across filter changes --}}

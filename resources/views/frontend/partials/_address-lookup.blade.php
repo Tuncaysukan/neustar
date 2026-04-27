@@ -3,7 +3,7 @@
      Başlık: padded; harita: mobilde px-0 (tam sütun), sm+ ile max-w-7xl hizası
      Alpine: addressLookup (resources/js/address-lookup.js)
 ============================================================= --}}
-<section class="mt-20 bg-[rgb(248,248,248)] pt-10 pb-0 sm:py-14 overflow-x-hidden" id="altyapi-sorgulama">
+<section class="mt-10 sm:mt-20 bg-[rgb(248,248,248)] pt-8 pb-0 sm:py-14 overflow-x-hidden" id="altyapi-sorgulama">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex items-end justify-between gap-4 flex-wrap">
                 <h2 class="ns-section-title mt-2">Şehrine Özel İnternet Tarifelerini Bul</h2><br>

@@ -1,7 +1,6 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
-import SpeedTest from '@cloudflare/speedtest';
 import addressLookup from './address-lookup';
 import cityMap from './city-map';
 import districtLookup from './district-lookup';
@@ -166,36 +165,43 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('districtLookup', districtLookup);
 
     Alpine.data('speedTest', () => ({
-        status: 'idle',
+        status: 'idle',   // idle | running | done | error
         phase: 'Başlatmaya hazır',
-        summary: {},
-        liveDown: 0,
-        liveUp: 0,
         error: null,
         finishedAt: null,
-        packetLossSupported: false,
-        _engine: null,
 
-        phaseLabels: {
-            latency: 'Gecikme ölçülüyor',
-            download: 'İndirme hızı ölçülüyor',
-            upload: 'Yükleme hızı ölçülüyor',
-            packetLoss: 'Paket kaybı ölçülüyor',
+        // Sonuçlar
+        downloadMbps: null,
+        uploadMbps: null,
+        pingMs: null,
+        jitterMs: null,
+
+        // Canlı gösterge
+        liveDown: 0,
+        liveUp: 0,
+        packetLossSupported: false,  // view uyumluluğu için
+
+        // Özet (eski API uyumluluğu için)
+        get summary() {
+            return {
+                download: this.downloadMbps != null ? this.downloadMbps * 1e6 : null,
+                upload:   this.uploadMbps   != null ? this.uploadMbps   * 1e6 : null,
+                latency:  this.pingMs,
+                jitter:   this.jitterMs,
+            };
         },
 
         format(bps, decimals = 1) {
             if (bps == null || !Number.isFinite(bps)) return '—';
             const mbps = bps / 1e6;
             if (mbps >= 100) return mbps.toFixed(0);
-            if (mbps >= 10) return mbps.toFixed(1);
+            if (mbps >= 10)  return mbps.toFixed(1);
             return mbps.toFixed(decimals);
         },
-
         formatMs(ms) {
             if (ms == null || !Number.isFinite(ms)) return '—';
             return Math.round(ms).toString();
         },
-
         formatPct(p) {
             if (p == null || !Number.isFinite(p)) return '—';
             return p.toFixed(p < 10 ? 2 : 1);
@@ -204,84 +210,131 @@ document.addEventListener('alpine:init', () => {
         async start() {
             if (this.status === 'running') return;
             this._reset();
-            this.status = 'running';
-            this.phase = 'Hazırlanıyor…';
+            this.status  = 'running';
 
-            // Try to get TURN creds so we can include packet-loss; fall back
-            // to a measurement plan without it when the endpoint is unreachable.
-            const turnCreds = await fetchTurnCreds();
-            const config = { autoStart: false };
-            if (turnCreds) {
-                Object.assign(config, turnCreds);
-                this.packetLossSupported = true;
-            } else {
-                config.measurements = MEASUREMENTS_NO_PACKET_LOSS;
-                this.packetLossSupported = false;
-            }
-
-            let engine;
             try {
-                engine = new SpeedTest(config);
-            } catch (e) {
-                this.error = 'Tarayıcınız bu ölçümü desteklemiyor olabilir.';
-                this.status = 'error';
-                return;
-            }
-            this._engine = engine;
+                // 1. Ping ölç (4 istek, en düşük al)
+                this.phase = 'Gecikme ölçülüyor…';
+                this.pingMs   = await this._measurePing();
+                this.jitterMs = await this._measureJitter();
 
-            engine.onPhaseChange = ({ measurement }) => {
-                const label = this.phaseLabels[measurement?.type];
-                if (label) this.phase = label + '…';
-            };
+                // 2. İndirme hızı
+                this.phase = 'İndirme hızı ölçülüyor…';
+                this.downloadMbps = await this._measureDownload();
 
-            engine.onResultsChange = () => {
-                this.summary = { ...engine.results.getSummary() };
-                const dl = engine.results.getDownloadBandwidth();
-                const up = engine.results.getUploadBandwidth();
-                if (typeof dl === 'number') this.liveDown = dl;
-                if (typeof up === 'number') this.liveUp = up;
-            };
+                // 3. Yükleme hızı
+                this.phase = 'Yükleme hızı ölçülüyor…';
+                this.uploadMbps = await this._measureUpload();
 
-            engine.onFinish = (results) => {
-                this.summary = results.getSummary();
-                this.phase = 'Ölçüm tamamlandı';
-                this.status = 'done';
+                this.phase      = 'Ölçüm tamamlandı';
+                this.status     = 'done';
                 this.finishedAt = new Date();
-            };
-
-            engine.onError = (err) => {
-                const msg = String(err?.message || err || '');
-                // Swallow packet-loss specific errors — they shouldn't kill the run.
-                if (/packet\s*loss|turnServerUser/i.test(msg)) {
-                    this.packetLossSupported = false;
-                    return;
-                }
-                this.error = msg || 'Bilinmeyen bir hata oluştu.';
-                this.status = 'error';
-            };
-
-            try {
-                engine.play();
             } catch (e) {
-                this.error = String(e?.message || e);
+                this.error  = String(e?.message || e || 'Bilinmeyen hata');
                 this.status = 'error';
             }
         },
 
-        restart() {
-            if (this._engine) {
-                try { this._engine.pause(); } catch {}
-            }
-            this.start();
-        },
+        restart() { this.start(); },
 
         _reset() {
-            this.summary = {};
-            this.liveDown = 0;
-            this.liveUp = 0;
-            this.phase = 'Başlatmaya hazır';
-            this.error = null;
-            this.finishedAt = null;
+            this.downloadMbps = null;
+            this.uploadMbps   = null;
+            this.pingMs       = null;
+            this.jitterMs     = null;
+            this.liveDown     = 0;
+            this.liveUp       = 0;
+            this.error        = null;
+            this.finishedAt   = null;
+            this.phase        = 'Hazırlanıyor…';
+        },
+
+        // ── Ping: 5 istek, medyan al ──────────────────────────────
+        async _measurePing() {
+            const url = 'https://speed.cloudflare.com/__down?bytes=1000';
+            const times = [];
+            for (let i = 0; i < 5; i++) {
+                const t0 = performance.now();
+                await fetch(url + '&r=' + Math.random(), { cache: 'no-store' });
+                times.push(performance.now() - t0);
+            }
+            times.sort((a, b) => a - b);
+            return Math.round(times[Math.floor(times.length / 2)]);
+        },
+
+        // ── Jitter: ping varyansı ─────────────────────────────────
+        async _measureJitter() {
+            const url = 'https://speed.cloudflare.com/__down?bytes=1000';
+            const times = [];
+            for (let i = 0; i < 6; i++) {
+                const t0 = performance.now();
+                await fetch(url + '&r=' + Math.random(), { cache: 'no-store' });
+                times.push(performance.now() - t0);
+            }
+            const diffs = [];
+            for (let i = 1; i < times.length; i++) diffs.push(Math.abs(times[i] - times[i-1]));
+            return Math.round(diffs.reduce((a, b) => a + b, 0) / diffs.length);
+        },
+
+        // ── İndirme: 3 farklı boyut, ağırlıklı ortalama ──────────
+        async _measureDownload() {
+            const sizes = [
+                { bytes: 1e5,  weight: 1 },
+                { bytes: 1e6,  weight: 2 },
+                { bytes: 25e6, weight: 4 },
+            ];
+            let totalBits = 0, totalWeight = 0;
+
+            for (const { bytes, weight } of sizes) {
+                const url = `https://speed.cloudflare.com/__down?bytes=${bytes}&r=${Math.random()}`;
+                const t0  = performance.now();
+                const res = await fetch(url, { cache: 'no-store' });
+                await res.arrayBuffer();
+                const elapsed = (performance.now() - t0) / 1000;
+                const mbps    = (bytes * 8) / elapsed / 1e6;
+                totalBits   += mbps * weight;
+                totalWeight += weight;
+                // Canlı güncelle
+                this.liveDown = (totalBits / totalWeight) * 1e6;
+            }
+            const result = totalBits / totalWeight;
+            this.liveDown = result * 1e6;
+            return Math.round(result * 10) / 10;
+        },
+
+        // ── Yükleme: Laravel proxy üzerinden (CORS sorunu yok) ──────
+        async _measureUpload() {
+            const sizes = [
+                { bytes: 1e5,  weight: 1 },
+                { bytes: 5e5,  weight: 2 },
+                { bytes: 1e6,  weight: 3 },
+            ];
+            let totalBits = 0, totalWeight = 0;
+
+            for (const { bytes, weight } of sizes) {
+                const body = new Uint8Array(bytes);
+                const url  = `/hiz-testi-upload?r=${Math.random()}`;
+                const t0   = performance.now();
+                try {
+                    await fetch(url, {
+                        method: 'POST',
+                        body,
+                        cache: 'no-store',
+                        headers: {
+                            'Content-Type': 'application/octet-stream',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '',
+                        },
+                    });
+                } catch { /* upload hatası — atla */ }
+                const elapsed = (performance.now() - t0) / 1000;
+                const mbps    = (bytes * 8) / elapsed / 1e6;
+                totalBits   += mbps * weight;
+                totalWeight += weight;
+                this.liveUp = (totalBits / totalWeight) * 1e6;
+            }
+            const result = totalBits / totalWeight;
+            this.liveUp = result * 1e6;
+            return Math.round(result * 10) / 10;
         },
     }));
 });

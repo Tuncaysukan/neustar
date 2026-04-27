@@ -19,121 +19,145 @@
             </div>
 
             {{-- ===== Main panel ===== --}}
-            <div class="mt-10 ns-surface p-6 sm:p-10">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="mt-10 ns-surface p-6 sm:p-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-                    {{-- Gauge --}}
-                    <div class="lg:col-span-5">
-                        <div class="rounded-xl bg-base-200 border border-base-300 p-6 text-center">
-                            <div class="ns-meta-label">İndirme hızı</div>
+                    {{-- Sol: Yarım daire kadran + buton --}}
+                    <div class="flex flex-col items-center">
 
-                            <div class="mt-5 mx-auto h-48 w-48 rounded-full border-[6px] grid place-items-center transition-colors"
-                                 :class="status === 'running' ? 'border-primary' : (status === 'done' ? 'border-primary/60' : 'border-base-300')">
-                                <div>
-                                    <div class="text-4xl sm:text-5xl font-bold tabular-nums leading-none"
-                                         :class="status === 'idle' ? 'text-base-content/40' : 'text-base-content'">
-                                        <span x-text="format(summary.download ?? liveDown)"></span>
-                                    </div>
-                                    <div class="ns-meta-label mt-2">Mbps</div>
-                                </div>
+                        {{-- Yarım daire SVG --}}
+                        <div class="relative" style="width:260px;height:140px;overflow:hidden;">
+                            <svg viewBox="0 0 260 140" style="width:260px;height:140px;">
+                                {{-- Arka plan yarım daire --}}
+                                <path d="M 20 130 A 110 110 0 0 1 240 130"
+                                      fill="none"
+                                      stroke="#e5e7eb"
+                                      stroke-width="18"
+                                      stroke-linecap="round"/>
+                                {{-- İlerleme yarım daire --}}
+                                <path d="M 20 130 A 110 110 0 0 1 240 130"
+                                      fill="none"
+                                      stroke="#f97316"
+                                      stroke-width="18"
+                                      stroke-linecap="round"
+                                      :stroke-dasharray="`${345 * Math.min(1, (summary.download ?? liveDown) / (1000 * 1e6))} 345`"
+                                      :style="status === 'idle' ? 'stroke:#e5e7eb' : 'stroke:#f97316'"
+                                      style="transition: stroke-dasharray 0.5s ease;"/>
+                            </svg>
+                            {{-- Ortadaki değer --}}
+                            <div style="position:absolute;bottom:0;left:0;right:0;text-align:center;padding-bottom:4px;">
+                                <div class="text-5xl font-black tabular-nums leading-none"
+                                     :class="status === 'idle' ? 'text-base-content/30' : 'text-base-content'"
+                                     x-text="format(summary.download ?? liveDown)"></div>
+                                <div class="text-sm font-semibold text-base-content/50 mt-1 uppercase tracking-widest">Mbps</div>
                             </div>
+                        </div>
 
+                        {{-- Durum / Buton --}}
+                        <div class="mt-6 w-full max-w-xs">
                             <button type="button"
-                                    class="btn btn-primary btn-lg w-full mt-6"
+                                    class="btn btn-primary btn-lg w-full"
                                     x-show="status !== 'running'"
                                     @click="status === 'done' ? restart() : start()">
-                                <span x-text="status === 'done' ? 'Yeniden test et' : (status === 'error' ? 'Tekrar dene' : 'Testi başlat')"></span>
+                                <template x-if="status === 'done'">
+                                    <span class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        Yeniden test et
+                                    </span>
+                                </template>
+                                <template x-if="status !== 'done'">
+                                    <span x-text="status === 'error' ? 'Tekrar dene' : 'Testi başlat'"></span>
+                                </template>
                             </button>
 
                             <button type="button"
-                                    class="btn btn-lg w-full mt-6 pointer-events-none"
+                                    class="btn btn-lg w-full pointer-events-none"
                                     x-show="status === 'running'" disabled>
                                 <span class="loading loading-spinner loading-xs"></span>
                                 <span>Ölçülüyor…</span>
                             </button>
 
-                            <div class="mt-3 text-xs text-base-content/60" x-text="phase"></div>
+                            <p class="mt-2 text-xs text-center text-base-content/50" x-text="phase"></p>
                         </div>
                     </div>
 
-                    {{-- Metrics --}}
-                    <div class="lg:col-span-7">
+                    {{-- Sağ: Metrik listesi --}}
+                    <div class="space-y-3">
 
-                        {{-- Primary metrics --}}
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">Ping</div>
-                                <div class="mt-1 text-lg font-semibold tabular-nums leading-tight">
-                                    <span x-text="formatMs(summary.latency)"></span><span class="text-xs font-normal text-base-content/55"> ms</span>
-                                </div>
+                        {{-- Download --}}
+                        <div class="flex items-center justify-between ns-surface rounded-xl px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background:#3b82f6;"></span>
+                                <span class="text-sm font-semibold text-base-content/70">Download</span>
                             </div>
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">İndirme</div>
-                                <div class="mt-1 text-lg font-semibold tabular-nums leading-tight">
-                                    <span x-text="format(summary.download)"></span><span class="text-xs font-normal text-base-content/55"> Mbps</span>
-                                </div>
-                            </div>
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">Yükleme</div>
-                                <div class="mt-1 text-lg font-semibold tabular-nums leading-tight">
-                                    <span x-text="format(summary.upload)"></span><span class="text-xs font-normal text-base-content/55"> Mbps</span>
-                                </div>
-                            </div>
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">Jitter</div>
-                                <div class="mt-1 text-lg font-semibold tabular-nums leading-tight">
-                                    <span x-text="formatMs(summary.jitter)"></span><span class="text-xs font-normal text-base-content/55"> ms</span>
-                                </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-black tabular-nums"
+                                      x-text="format(summary.download ?? liveDown)"></span>
+                                <span class="text-sm font-semibold text-base-content/50 ml-1">Mbps</span>
                             </div>
                         </div>
 
-                        {{-- Secondary metrics (shown after finish) --}}
-                        <div class="mt-2.5 grid grid-cols-1 sm:grid-cols-3 gap-2.5"
-                             x-show="status === 'done'" x-cloak x-transition.opacity>
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">Yüklü ping (ind.)</div>
-                                <div class="mt-1 text-sm font-semibold tabular-nums">
-                                    <span x-text="formatMs(summary.downLoadedLatency)"></span>
-                                    <span class="text-xs font-normal text-base-content/55"> ms</span>
-                                </div>
+                        {{-- Upload --}}
+                        <div class="flex items-center justify-between ns-surface rounded-xl px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background:#f97316;"></span>
+                                <span class="text-sm font-semibold text-base-content/70">Upload</span>
                             </div>
-                            <div class="ns-data-cell">
-                                <div class="ns-meta-label">Yüklü ping (yük.)</div>
-                                <div class="mt-1 text-sm font-semibold tabular-nums">
-                                    <span x-text="formatMs(summary.upLoadedLatency)"></span>
-                                    <span class="text-xs font-normal text-base-content/55"> ms</span>
-                                </div>
-                            </div>
-                            <div class="ns-data-cell" x-show="packetLossSupported" x-cloak>
-                                <div class="ns-meta-label">Paket kaybı</div>
-                                <div class="mt-1 text-sm font-semibold tabular-nums">
-                                    <span x-text="formatPct(summary.packetLoss)"></span>
-                                    <span class="text-xs font-normal text-base-content/55"> %</span>
-                                </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-black tabular-nums"
+                                      x-text="format(summary.upload ?? liveUp)"></span>
+                                <span class="text-sm font-semibold text-base-content/50 ml-1">Mbps</span>
                             </div>
                         </div>
 
-                        {{-- Error state --}}
-                        <div class="mt-4 rounded-md border border-error/40 bg-error/5 p-4"
+                        {{-- Ping --}}
+                        <div class="flex items-center justify-between ns-surface rounded-xl px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background:#6b7280;"></span>
+                                <span class="text-sm font-semibold text-base-content/70">Ping</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-black tabular-nums"
+                                      x-text="formatMs(summary.latency)"></span>
+                                <span class="text-sm font-semibold text-base-content/50 ml-1">ms</span>
+                            </div>
+                        </div>
+
+                        {{-- Jitter --}}
+                        <div class="flex items-center justify-between ns-surface rounded-xl px-5 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="h-2.5 w-2.5 rounded-full shrink-0" style="background:#6b7280;"></span>
+                                <span class="text-sm font-semibold text-base-content/70">Jitter</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-black tabular-nums"
+                                      x-text="formatMs(summary.jitter)"></span>
+                                <span class="text-sm font-semibold text-base-content/50 ml-1">ms</span>
+                            </div>
+                        </div>
+
+                        {{-- Error --}}
+                        <div class="rounded-xl border border-error/40 bg-error/5 p-4"
                              x-show="status === 'error'" x-cloak>
                             <p class="text-sm font-semibold text-error">Ölçüm tamamlanamadı</p>
                             <p class="mt-1 text-xs text-base-content/70" x-text="error"></p>
                         </div>
 
                         {{-- Footer --}}
-                        <div class="mt-5 pt-4 border-t border-base-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                            <p class="text-xs text-base-content/55">
-                                Cloudflare ağı üzerinden ölçülüyor · tarayıcı tabanlı, gerçek ağ trafiği.
+                        <div class="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <p class="text-xs text-base-content/45">
+                                Cloudflare ağı · tarayıcı tabanlı
                                 <span x-show="finishedAt" x-cloak>
                                     · <span x-text="finishedAt?.toLocaleTimeString('tr-TR')"></span>
                                 </span>
                             </p>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <a href="{{ route('packages.index') }}" class="btn btn-ghost btn-sm">Paketleri incele</a>
-                                <a href="{{ route('compare') }}" class="btn btn-ghost btn-sm">Karşılaştır</a>
+                            <div class="flex items-center gap-2">
+                                <a href="{{ route('packages.index') }}" class="btn btn-ghost btn-xs">Paketleri incele</a>
+                                <a href="{{ route('compare') }}" class="btn btn-ghost btn-xs">Karşılaştır</a>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 

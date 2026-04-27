@@ -3,8 +3,16 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/hiz-testi', [\App\Http\Controllers\HomeController::class, 'speedTest'])->name('speed-test');
+// Upload hız testi proxy — CORS sorununu önler
+Route::post('/hiz-testi-upload', function (\Illuminate\Http\Request $request) {
+    // Gelen veriyi oku ve at — sadece süreyi ölçmek için
+    $request->getContent();
+    return response()->json(['ok' => true]);
+})->middleware('throttle:60,1')->name('speed-test.upload');
 Route::get('/taahhut-sayaci', [\App\Http\Controllers\HomeController::class, 'commitmentCounter'])->name('commitment-counter');
 Route::post('/taahhut-sayaci/hatirlatici', [\App\Http\Controllers\HomeController::class, 'commitmentReminderStore'])
     ->middleware('throttle:10,1')
@@ -80,7 +88,26 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('sponsors', \App\Http\Controllers\Admin\SponsorController::class);
     Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
     Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class);
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+        ->except(['show']);
+    // Yorum moderasyonu
+    Route::get('reviews', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews.index');
+    Route::post('reviews/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::delete('reviews/{review}', [\App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::post('reviews/bulk-approve', [\App\Http\Controllers\Admin\ReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+    // Taahhüt hatırlatıcıları
+    Route::get('commitment-reminders', [\App\Http\Controllers\Admin\CommitmentReminderController::class, 'index'])->name('commitment-reminders.index');
+    Route::delete('commitment-reminders/{commitmentReminder}', [\App\Http\Controllers\Admin\CommitmentReminderController::class, 'destroy'])->name('commitment-reminders.destroy');
+    // Site ayarları
+    Route::get('site-settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'index'])->name('site-settings.index');
+    Route::put('site-settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'update'])->name('site-settings.update');
     Route::resource('seo', \App\Http\Controllers\Admin\SeoContentController::class);
+    // CSS / JS Editörü
+    Route::get('custom-code', [\App\Http\Controllers\Admin\CustomCodeController::class, 'index'])
+        ->name('custom-code.index');
+    Route::put('custom-code/{key}', [\App\Http\Controllers\Admin\CustomCodeController::class, 'update'])
+        ->where('key', '[a-z_]+')
+        ->name('custom-code.update');
     Route::resource('tariff-seo', \App\Http\Controllers\Admin\TariffSeoController::class)
         ->except(['show'])
         ->parameters(['tariff-seo' => 'tariffSeo']);

@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', config('app.name', 'Neustar'))</title>
-    <meta name="description" content="@yield('meta_description', 'İnternet paketlerini karşılaştır, en uygununu seç.')">
+    <title>@yield('title', \App\Models\SiteSetting::get('meta_title', config('app.name', 'Neustar')))</title>
+    <meta name="description" content="@yield('meta_description', \App\Models\SiteSetting::get('meta_description', 'İnternet paketlerini karşılaştır, en uygununu seç.'))">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{-- Admin'den eklenen özel CSS --}}
+    @php $customCss = \App\Models\CustomCode::get('custom_css'); @endphp
+    @if($customCss)
+    <style>{!! $customCss !!}</style>
+    @endif
 </head>
 <body
     class="min-h-screen font-sans antialiased bg-base-200 text-base-content"
@@ -126,7 +132,7 @@
             </main>
 
             {{-- ============ Footer ============ --}}
-            <footer class="mt-16 ns-footer">
+            <footer class="mt-10 sm:mt-16 ns-footer">
                 <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                         <div class="md:col-span-5">
@@ -184,9 +190,9 @@
                     <div class="mt-10 rounded-xl border border-white/10 bg-white/5 p-5 sm:p-6 flex gap-4">
                         {{-- Info ikonu --}}
                         <div class="shrink-0 mt-0.5">
-                            <div class="h-8 w-8 rounded-full border border-primary/40 bg-primary/10 text-primary grid place-items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
-                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <div class="h-9 w-9 rounded-full border-2 border-[#1bb6ad] bg-[#1bb6ad]/20 text-[#1bb6ad] grid place-items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"/>
                                     <path d="M12 16v-4M12 8h.01"/>
                                 </svg>
@@ -349,5 +355,11 @@
             </aside>
         </div>
     </div>
+
+    {{-- Admin'den eklenen özel JS --}}
+    @php $customJs = \App\Models\CustomCode::get('custom_js'); @endphp
+    @if($customJs)
+    <script>{!! $customJs !!}</script>
+    @endif
 </body>
 </html>

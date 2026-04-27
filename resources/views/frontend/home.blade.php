@@ -3,19 +3,19 @@
 @section('content')
     {{-- ====================== HERO (B: compact, search-led) ====================== --}}
     <section class="ns-hero">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-14 pb-16 sm:pt-20 sm:pb-20 relative z-10">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pt-8 pb-10 sm:pt-20 sm:pb-20 relative z-10">
             <div class="max-w-4xl">
                 
                 <h1 class="ns-hero-title mt-4 max-w-3xl">
-                    Uygun Ev İnternet Paketlerini Bul! 
+                    Uygun Ev İnternet Paketlerini Bul!
                 </h1>
-                <p class="mt-4 text-neutral-content/70 leading-relaxed text-base">
-                    Taahhütlü sabit fiyat mı, yoksa taahhütsüz özgürlük mü? Onlarca ev interneti paketlerini hız, bütçe ve taahhüt durumuna göre anında filtreleyin.                    Net Karşılaştırın!
+                <p class="mt-4 text-neutral-content/70 leading-relaxed max-w-2xl" style="font-size:1rem">
+                    Taahhütlü sabit fiyat mı, yoksa taahhütsüz özgürlük mü? Onlarca ev interneti paketlerini hız, bütçe ve taahhüt durumuna göre anında filtreleyin. Net Karşılaştırın.!
                 </p>
             </div>
 
             {{-- Search bar: 3 inputs + submit, filling the width below the title --}}
-             <form action="{{ route('packages.index') }}" method="GET" class="mt-10">
+             <form action="{{ route('packages.index') }}" method="GET" class="mt-6 sm:mt-10">
                 <div class="ns-searchbar">
                     <div class="grid grid-cols-1 md:grid-cols-12 items-stretch md:divide-x md:divide-base-300">
                         <div class="md:col-span-4 ns-searchfield">
@@ -131,7 +131,7 @@
     </section>
 
     {{-- ====================== Tools ====================== --}}
-    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-16">
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-16">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <a href="{{ route('speed-test') }}" class="ns-tool-tile group">
                 <div class="flex items-start gap-5">
@@ -176,7 +176,7 @@
     </section>
 
     {{-- ====================== Öne Çıkan Paketler ====================== --}}
-    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-0 sm:mt-20">
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-8 sm:mt-20">
         <div class="flex items-end justify-between gap-4 flex-wrap">
             <div>
                 <div class="ns-section-eyebrow">Öne çıkan paketler</div>
@@ -250,7 +250,7 @@
 
     {{-- ====================== Blog ====================== --}}
     @if($latestBlogs->count() > 0)
-    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-20">
+    <section class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-10 sm:mt-20">
         <div class="flex items-end justify-between gap-4 flex-wrap">
             <div>
                 <div class="ns-section-eyebrow">Yazılar</div>
@@ -295,7 +295,7 @@
 
     {{-- ====================== SSS ====================== --}}
     @if($faqs->count() > 0)
-    <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 mt-20">
+    <section class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 mt-10 sm:mt-20">
         <div>
             <div class="ns-section-eyebrow">SSS</div>
             <h2 class="ns-section-title mt-2">Sıkça sorulanlar</h2>

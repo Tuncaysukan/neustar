@@ -128,22 +128,69 @@
                         {{-- Sonuç --}}
                         <div class="mt-6" x-show="result" x-transition x-cloak>
                             <div class="rounded-xl bg-base-200 border border-base-300 p-6">
-                                <div class="ns-meta-label">Kalan süre</div>
-                                <div class="mt-3 grid grid-cols-2 gap-2.5">
-                                    <div class="rounded-md bg-base-100 border border-base-300 p-4 text-center">
-                                        <div class="text-3xl font-bold tabular-nums" x-text="result?.diffDays ?? 0"></div>
-                                        <div class="ns-meta-label mt-1">Gün</div>
+
+                                {{-- Kadran + bilgi yan yana --}}
+                                <div class="flex flex-col sm:flex-row items-center gap-6">
+
+                                    {{-- SVG Kadran --}}
+                                    <div class="shrink-0 relative" style="width:176px;height:176px;">
+                                        <svg viewBox="0 0 160 160"
+                                             style="width:176px;height:176px;transform:rotate(-90deg);">
+                                            {{-- Arka plan halkası --}}
+                                            <circle cx="80" cy="80" r="60"
+                                                    fill="none"
+                                                    stroke="#e5e7eb"
+                                                    stroke-width="14"/>
+                                            {{-- İlerleme halkası (kalan süre) --}}
+                                            <circle cx="80" cy="80" r="60"
+                                                    fill="none"
+                                                    stroke="#1bb6ad"
+                                                    stroke-width="14"
+                                                    stroke-linecap="round"
+                                                    :stroke-dasharray="`${377 * Math.min(1, result ? result.diffDays / (Number(months) * 30) : 0)} 377`"
+                                                    style="transition: stroke-dasharray 0.7s ease;"/>
+                                        </svg>
+                                        {{-- Ortadaki metin --}}
+                                        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                            <span class="text-3xl font-bold tabular-nums leading-none"
+                                                  x-text="result?.diffDays ?? 0"></span>
+                                            <span class="text-xs mt-1 font-semibold uppercase tracking-wider"
+                                                  style="color:#6b7280;">Gün</span>
+                                        </div>
                                     </div>
-                                    <div class="rounded-md bg-base-100 border border-base-300 p-4 text-center">
-                                        <div class="text-3xl font-bold tabular-nums" x-text="result?.diffMonths ?? 0"></div>
-                                        <div class="ns-meta-label mt-1">Ay</div>
+
+                                    {{-- Detay bilgiler --}}
+                                    <div class="flex-1 w-full space-y-3">
+                                        <div class="flex items-center justify-between rounded-lg bg-base-100 border border-base-300 px-4 py-3">
+                                            <span class="text-xs text-base-content/55 font-semibold uppercase tracking-wider">Kalan Ay</span>
+                                            <span class="text-xl font-bold tabular-nums" x-text="result?.diffMonths ?? 0"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between rounded-lg bg-base-100 border border-base-300 px-4 py-3">
+                                            <span class="text-xs text-base-content/55 font-semibold uppercase tracking-wider">Bitiş Tarihi</span>
+                                            <span class="text-sm font-semibold"
+                                                  x-text="result ? result.end.toLocaleDateString('tr-TR') : '—'"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between rounded-lg px-4 py-3"
+                                             :class="result && result.diffDays <= 30 ? 'bg-error/10 border border-error/30' :
+                                                     result && result.diffDays <= 90 ? 'bg-warning/10 border border-warning/30' :
+                                                     'bg-success/10 border border-success/30'">
+                                            <span class="text-xs font-semibold uppercase tracking-wider"
+                                                  :class="result && result.diffDays <= 30 ? 'text-error' :
+                                                          result && result.diffDays <= 90 ? 'text-warning' :
+                                                          'text-success'">Durum</span>
+                                            <span class="text-xs font-bold"
+                                                  :class="result && result.diffDays <= 30 ? 'text-error' :
+                                                          result && result.diffDays <= 90 ? 'text-warning' :
+                                                          'text-success'"
+                                                  x-text="result && result.diffDays === 0 ? 'Taahhüt bitti!' :
+                                                           result && result.diffDays <= 30 ? 'Bitiyor — Hemen karşılaştır!' :
+                                                           result && result.diffDays <= 90 ? 'Yaklaşıyor — Kampanyaları tara' :
+                                                           'Devam ediyor'">
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                                <p class="mt-4 text-sm text-base-content/70">
-                                    Bitiş tarihi:
-                                    <span class="font-semibold text-base-content"
-                                        x-text="result ? result.end.toLocaleDateString('tr-TR') : ''"></span>
-                                </p>
+
                             </div>
                         </div>
                     </div>
