@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
-@section('title', 'Blog — Neustar')
-@section('meta_description', 'Tarife inceleme, hız testi, altyapı rehberleri.')
+@section('title', 'Ev İnternet Rehberi Blog — Neustar')
+@section('meta_description', 'Ev interneti tarifeleri, altyapı rehberleri, hız testi ipuçları ve operatör karşılaştırmaları.')
 
 @section('content')
     {{-- ===== Header ===== --}}
@@ -10,10 +10,10 @@
             <div class="max-w-2xl">
                 <div class="ns-section-eyebrow">Blog</div>
                 <h1 class="mt-2 text-2xl sm:text-4xl font-bold tracking-tight">
-                    Tarife, altyapı, hız testi — arkasındaki detaylar.
+                    Ev İnternet Rehberi
                 </h1>
                 <p class="mt-4 text-base text-base-content/65 leading-relaxed">
-                    Operatörlerin kampanya sayfalarında görmeyeceğin notlar ve kısa rehberler.
+                    Tarife karşılaştırma, altyapı rehberleri, hız testi ipuçları ve operatör kampanyaları.
                 </p>
 
                 <form action="{{ route('blog.index') }}" method="GET" class="mt-6 flex items-center gap-2 max-w-lg">

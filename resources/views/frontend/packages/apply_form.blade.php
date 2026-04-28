@@ -20,12 +20,16 @@
                 </p>
 
                 <div class="mt-10 ns-surface rounded-2xl p-6 border border-base-300">
-                    <div class="flex items-center gap-4 pb-5 border-b border-base-300">
-                        <x-brand-mark :operator="$package->operator" size="md" />
-                        <div class="min-w-0">
-                            <div class="text-xs text-base-content/55">{{ $package->operator->name }}</div>
-                            <div class="text-sm font-semibold leading-snug">{{ $package->name }}</div>
-                        </div>
+                    {{-- Logo tam genişlik --}}
+                    <div class="flex items-center justify-center pb-5 border-b border-base-300">
+                        @if($package->operator->logo_url)
+                            <img src="{{ $package->operator->logo_url }}"
+                                 alt="{{ $package->operator->name }} logosu"
+                                 class="w-full max-h-20 object-contain"
+                                 loading="lazy">
+                        @else
+                            <x-brand-mark :operator="$package->operator" size="2xl" rounded="xl" />
+                        @endif
                     </div>
 
                     <dl class="mt-6 space-y-4">
@@ -89,11 +93,12 @@
                             @error('email') <p class="text-xs text-error mt-1">{{ $message }}</p> @enderror
                         </div>
 
-                        <div x-data="{ phone: '{{ old('phone', '+90(5__)___-____') }}' }">
+                        <div x-data="{ phone: '{{ old('phone', '') }}' }">
                             <label class="ns-meta-label block mb-1.5 text-xs font-semibold uppercase tracking-wider">Telefon Numarası</label>
                             <input type="tel" name="phone" required
                                    class="input input-bordered w-full focus:ring-primary/20"
-                                   x-model="phone" @input="maskPhone($event.target); phone = $event.target.value" @focus="maskPhone($event.target)">
+                                   placeholder="05XX XXX XX XX"
+                                   x-model="phone" @input="maskPhone($event.target); phone = $event.target.value">
                             @error('phone') <p class="text-xs text-error mt-1">{{ $message }}</p> @enderror
                         </div>
 

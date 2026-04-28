@@ -18,7 +18,7 @@
                     </nav>
 
                     <div class="mt-4 flex items-center gap-4">
-                        <x-brand-mark :operator="$package->operator" size="lg" rounded="lg" />
+                        <x-brand-mark :operator="$package->operator" size="2xl" rounded="xl" />
                         <div class="min-w-0">
                             <a href="{{ route('operators.show', $package->operator->slug) }}"
                                class="text-sm font-semibold text-base-content/80 hover:text-primary transition no-underline">

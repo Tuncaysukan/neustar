@@ -1,0 +1,15 @@
+mobildeki   boşlukları   düşür 
+footer  verikaynağı  solunda   ufak bir  logo var onu  renklendir  
+filtrede  URL  seçim  yapıldıkca URL  ismi  değişecek 
+backend tarafında  birden  fazla  logo  ekleyebilecek 
+markalar  da   ISP  ve  Aktiflik kaldırılacak 
+Markalar  yerine intennet  servis  sağlayıcı olarak değiştir  
+hız testinin  isteği  buraya  atıyor kontrol et ve düzenle  https://speed.cloudflare.com/__down?bytes=25000000&r=0.135411505019556
+tasarımı   saat veya  araç  kadranı  gibi bir şey  eklenecek  
+http://127.0.0.1:8001/taahhut-sayaci  buradaki Taahhüt süresi admin  panelinden  eklensin 
+telefon giriş ve  silişte  hata var onu  kontrol et  
+http://127.0.0.1:8001/blog   arama  box blog sayfasında  ara ev internet  rehbet  blogu 
+404  Laravel  sayfası vermesin tasarlama 
+http://127.0.0.1:8001/paket/digiturk-100-mbps-internet-ilk-3-ay-indirimli-kampanya  logo büyüt
+http://127.0.0.1:8001/internet-paketleri/digiturk-100-mbps-internet-ilk-3-ay-indirimli-kampanya/basvur bu  URL deki  Logo büyüt 
+bunları maddeler  haline  getir ve  başla her madde  için benden onay al ve  geliştireceklerini  yaz 

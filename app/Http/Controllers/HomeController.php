@@ -50,6 +50,18 @@ class HomeController extends Controller
 
     public function commitmentCounter()
     {
+        // Admin'den yönetilen taahhüt süreleri
+        $durationsRaw = \App\Models\SiteSetting::get('commitment_durations', '12,24');
+        $durations = collect(explode(',', $durationsRaw))
+            ->map(fn($v) => (int) trim($v))
+            ->filter(fn($v) => $v > 0)
+            ->values()
+            ->toArray();
+
+        if (empty($durations)) {
+            $durations = [12, 24];
+        }
+
         $faqs = Faq::where('is_active', true)
             ->where(function ($query) {
                 $query->where('page_type', 'commitment')
@@ -57,20 +69,29 @@ class HomeController extends Controller
             })
             ->orderBy('order')
             ->get();
-        
-        return view('frontend.tools.commitment-counter', compact('faqs'));
+
+        return view('frontend.tools.commitment-counter', compact('faqs', 'durations'));
     }
 
     public function commitmentReminderStore(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
     {
+        // Geçerli taahhüt sürelerini DB'den al
+        $durationsRaw = \App\Models\SiteSetting::get('commitment_durations', '12,24');
+        $validDurations = collect(explode(',', $durationsRaw))
+            ->map(fn($v) => (int) trim($v))
+            ->filter(fn($v) => $v > 0)
+            ->values()
+            ->toArray();
+        if (empty($validDurations)) $validDurations = [12, 24];
+
         $data = $request->validate([
-            'email'      => ['nullable', 'email', 'max:160'],
-            'phone'      => ['nullable', 'string', 'max:32', 'regex:/^[0-9 +()\-]{7,}$/'],
-            'start_date' => ['required', 'date'],
-            'months'     => ['required', 'integer', 'in:12,24'],
-            'end_date'   => ['required', 'date'],
+            'email'          => ['nullable', 'email', 'max:160'],
+            'phone'          => ['nullable', 'string', 'max:32', 'regex:/^[0-9 +()\-]{7,}$/'],
+            'start_date'     => ['required', 'date'],
+            'months'         => ['required', 'integer', 'in:' . implode(',', $validDurations)],
+            'end_date'       => ['required', 'date'],
             'remaining_days' => ['required', 'integer', 'min:0'],
-            'kvkk'       => ['required', 'accepted'],
+            'kvkk'           => ['required', 'accepted'],
         ]);
 
         // En az biri zorunlu

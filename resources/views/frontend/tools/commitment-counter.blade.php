@@ -5,12 +5,12 @@
 @section('content')
     <section class="py-12 sm:py-16" x-data="{
                     startDate: '',
-                    months: '12',
+                    months: '{{ $durations[0] ?? 12 }}',
                     result: null,
 
                     /* Hatırlatıcı formu */
                     email: '',
-                    phone: '+90(5__)___-____',
+                    phone: '',
                     reminderSent: false,
                     reminderLoading: false,
                     reminderError: '',
@@ -38,7 +38,7 @@
                         this.reminderError   = '';
                         this.reminderSuccess = '';
 
-                        let submittedPhone = this.phone === '+90(5__)___-____' ? '' : this.phone;
+                        let submittedPhone = this.phone.trim();
                         if (!this.email && !submittedPhone) {
                             this.reminderError = 'E-posta veya telefon numarasından en az birini girin.';
                             return;
@@ -63,7 +63,7 @@
                                 },
                                 body: JSON.stringify({
                                     email:           this.email   || null,
-                                    phone:           (this.phone === '+90(5__)___-____' ? null : this.phone),
+                                    phone:           this.phone.trim() || null,
                                     start_date:      this.startDate,
                                     months:          Number(this.months),
                                     end_date:        this.result.end.toISOString().slice(0, 10),
@@ -115,8 +115,9 @@
                             <div>
                                 <label class="ns-meta-label block mb-1.5">Taahhüt süresi</label>
                                 <select class="select select-bordered w-full" x-model="months" @change="compute()">
-                                    <option value="12">12 ay</option>
-                                    <option value="24">24 ay</option>
+                                    @foreach($durations as $dur)
+                                        <option value="{{ $dur }}">{{ $dur }} ay</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -237,9 +238,9 @@
                                             <span class="text-base-content/40 font-normal">(opsiyonel)</span>
                                         </label>
                                         <input type="tel" class="input input-bordered w-full"
+                                            placeholder="05XX XXX XX XX"
                                             inputmode="tel" autocomplete="tel" x-model="phone"
-                                            @input="maskPhone($event.target); phone = $event.target.value"
-                                            @focus="maskPhone($event.target)">
+                                            @input="maskPhone($event.target); phone = $event.target.value">
                                     </div>
                                 </div>
 

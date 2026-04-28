@@ -42,8 +42,21 @@ class BlogController extends Controller
 
     public function categoryIndex(string $categorySlug)
     {
-        $category = \App\Models\BlogCategory::where('slug', $categorySlug)->where('is_active', true)->firstOrFail();
-        
+        // Önce kategori olarak ara
+        $category = \App\Models\BlogCategory::where('slug', $categorySlug)
+            ->where('is_active', true)
+            ->first();
+
+        // Kategori bulunamazsa eski /blog/{slug} URL'si olabilir — slug ile yönlendir
+        if (! $category) {
+            $blog = Blog::published()->where('slug', $categorySlug)->first();
+            if ($blog) {
+                $catSlug = $blog->categoryRel?->slug ?? 'genel';
+                return redirect()->route('blog.show', [$catSlug, $blog->slug], 301);
+            }
+            abort(404);
+        }
+
         $blogs = Blog::published()
             ->with('categoryRel')
             ->where('blog_category_id', $category->id)

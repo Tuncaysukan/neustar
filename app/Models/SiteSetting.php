@@ -39,6 +39,7 @@ class SiteSetting extends Model
             ['key' => 'meta_title',       'label' => 'Varsayılan Meta Başlık','type' => 'text',     'group' => 'seo',     'order' => 11, 'value' => 'Neustar — İnternet Tarifeleri'],
             ['key' => 'meta_description', 'label' => 'Varsayılan Meta Açıklama','type' => 'textarea','group' => 'seo',    'order' => 12, 'value' => 'İnternet paketlerini karşılaştır, en uygununu seç.'],
             ['key' => 'footer_copyright', 'label' => 'Footer Telif Hakkı',   'type' => 'text',     'group' => 'general', 'order' => 13, 'value' => ''],
+            ['key' => 'commitment_durations', 'label' => 'Taahhüt Süreleri (ay, virgülle ayır)', 'type' => 'text', 'group' => 'general', 'order' => 14, 'value' => '12,24'],
         ];
     }
 }

@@ -28,6 +28,7 @@ Route::get('/internet-paketleri/{operatorSlug}/{infraSlug}', [\App\Http\Controll
     ->name('packages.operator_infra');
 Route::get('/paket/{slug}', [\App\Http\Controllers\PackageController::class, 'show'])->name('packages.show');
 Route::get('/internet-paketleri/{slug}/basvur', [\App\Http\Controllers\PackageController::class, 'apply'])->name('packages.apply');
+Route::get('/paket/{slug}/basvur', [\App\Http\Controllers\PackageController::class, 'apply'])->name('packages.apply.short');
 Route::post('/internet-paketleri/{slug}/basvur', [\App\Http\Controllers\PackageController::class, 'submitApplication'])->name('packages.apply.submit');
 
 // İl/ilçe bazlı tarife sayfaları

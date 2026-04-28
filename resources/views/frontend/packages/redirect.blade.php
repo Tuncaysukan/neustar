@@ -26,7 +26,7 @@
 
         {{-- Operatör logosu --}}
         <div class="flex justify-center mb-6">
-            <x-brand-mark :operator="$package->operator" size="xl" rounded="xl" />
+            <x-brand-mark :operator="$package->operator" size="2xl" rounded="xl" />
         </div>
 
         {{-- Başlık --}}

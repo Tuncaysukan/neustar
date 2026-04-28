@@ -67,7 +67,11 @@ class PackageController extends Controller
         }
 
         // --- Commitment --------------------------------------------------
-        $commitment = $request->query('commitment');
+        // URL'de okunabilir değerler: taahhütsüz=0, taahhutlu=1
+        $commitmentRaw = $request->query('commitment');
+        $commitmentMap = ['taahhütsüz' => '0', 'taahhütsuz' => '0', 'taahhütsüz' => '0', 'taahhutlu' => '1', 'taahhütlü' => '1'];
+        $commitment = $commitmentMap[$commitmentRaw] ?? $commitmentRaw; // eski 0/1 de çalışsın
+
         if ($commitment === '0') {
             $query->where('commitment_period', 0);
         } elseif ($commitment === '1') {
@@ -126,7 +130,7 @@ class PackageController extends Controller
             'infrastructure' => $infras,
             'speed'          => $speeds,
             'modem'          => $modems,
-            'commitment'     => $commitment,
+            'commitment'     => $commitment, // normalize edilmiş 0/1
             'price_min'      => is_numeric($priceMin) ? (float) $priceMin : null,
             'price_max'      => is_numeric($priceMax) ? (float) $priceMax : null,
         ];
