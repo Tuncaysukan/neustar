@@ -27,9 +27,9 @@
     ];
 
     $commitmentOptions = [
-        ''  => 'Farketmez',
-        '0' => 'Taahhütsüz',
-        '1' => 'Taahhütli',
+        ''           => 'Farketmez',
+        'taahhütsüz' => 'Taahhütsüz',
+        'taahhutlu'  => 'Taahhütlü',
     ];
 
     $modemOptions = [
@@ -58,7 +58,7 @@
                 $activeCount = count($filters['operator'])
                     + count($filters['infrastructure'])
                     + count($filters['speed'])
-                    + (in_array($filters['commitment'], ['0','1'], true) ? 1 : 0)
+                    + (in_array($filters['commitment'], ['taahhütsüz', 'taahhutlu'], true) ? 1 : 0)
                     + (($filters['price_min'] !== null || $filters['price_max'] !== null) ? 1 : 0)
                     + count($filters['modem'] ?? []);
             @endphp
@@ -339,8 +339,8 @@
                             @include('frontend.packages._filter-chip', ['label' => $modemOptions[$md] ?? $md, 'remove' => request()->fullUrlWithQuery(['modem' => array_values(array_diff($filters['modem'], [$md])) ?: null])])
                         @endforeach
 
-                        @if(in_array($filters['commitment'], ['0', '1'], true))
-                            @include('frontend.packages._filter-chip', ['label' => $filters['commitment'] === '0' ? 'Taahhütsüz' : 'Taahhütli', 'remove' => request()->fullUrlWithQuery(['commitment' => null])])
+                        @if(in_array($filters['commitment'], ['taahhütsüz', 'taahhutlu'], true))
+                            @include('frontend.packages._filter-chip', ['label' => $filters['commitment'] === 'taahhütsüz' ? 'Taahhütsüz' : 'Taahhütlü', 'remove' => request()->fullUrlWithQuery(['commitment' => null])])
                         @endif
 
                         @if($filters['price_min'] !== null || $filters['price_max'] !== null)
@@ -439,7 +439,7 @@
                                     @php
                                         $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
                                     @endphp
-                                    <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-full md:w-[160px] justify-center h-[28px] min-h-[28px] px-3 text-[13px] leading-none shrink-0 bg-[#fdee00] text-black border-0 hover:bg-[#e6d700] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/30">
+                                    <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-full md:w-[160px] justify-center h-[70px] min-h-[70px] px-3 text-[13px] leading-none shrink-0 btn-primary focus-visible:outline-none focus-visible:ring-2">
                                         Hemen başvur
                                     </a>
                                     @if($package->is_sponsored)

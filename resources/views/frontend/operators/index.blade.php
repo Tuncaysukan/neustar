@@ -3,15 +3,15 @@
 @section('title', 'İnternet Servis Sağlayıcıları — Neustar')
 
 @section('content')
-    <section class="py-12 sm:py-16">
+    <section class="py-6 sm:py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
             {{-- Header --}}
-            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                 <div class="max-w-2xl">
                     <div class="ns-section-eyebrow">Katalog</div>
-                    <h1 class="mt-2 text-3xl sm:text-4xl font-bold tracking-tight">İnternet Servis Sağlayıcıları</h1>
-                    <p class="mt-3 text-sm sm:text-base text-base-content/70 leading-relaxed">
+                    <h1 class="mt-2 text-2xl sm:text-4xl font-bold tracking-tight">İnternet Servis Sağlayıcıları</h1>
+                    <p class="mt-2 text-sm sm:text-base text-base-content/70 leading-relaxed">
                         İnternet servis sağlayıcılarını inceleyin, paketlerini tek ekranda karşılaştırın.
                     </p>
                 </div>
@@ -21,7 +21,7 @@
             </div>
 
             {{-- Grid --}}
-            <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 @foreach($operators as $operator)
                     <a href="{{ route('operators.show', $operator->slug) }}"
                        class="ns-surface ns-surface--hover p-6 group no-underline flex flex-col">

@@ -26,7 +26,7 @@
                     <div class="flex flex-col items-center">
 
                         {{-- Yarım daire SVG --}}
-                        <div class="relative" style="width:260px;height:140px;overflow:hidden;">
+                        <div class="relative" style="width:260px;height:165px;overflow:visible;margin-bottom:8px;">
                             <svg viewBox="0 0 260 140" style="width:260px;height:140px;">
                                 {{-- Arka plan yarım daire --}}
                                 <path d="M 20 130 A 110 110 0 0 1 240 130"
@@ -40,7 +40,7 @@
                                       stroke="#f97316"
                                       stroke-width="18"
                                       stroke-linecap="round"
-                                      :stroke-dasharray="`${345 * Math.min(1, (summary.download ?? liveDown) / (1000 * 1e6))} 345`"
+                                      :stroke-dasharray="`${345 * Math.min(1, (summary.download ?? liveDown) / (100 * 1e6))} 345`"
                                       :style="status === 'idle' ? 'stroke:#e5e7eb' : 'stroke:#f97316'"
                                       style="transition: stroke-dasharray 0.5s ease;"/>
                             </svg>
@@ -51,6 +51,10 @@
                                      x-text="format(summary.download ?? liveDown)"></div>
                                 <div class="text-sm font-semibold text-base-content/50 mt-1 uppercase tracking-widest">Mbps</div>
                             </div>
+                            {{-- Skala etiketleri --}}
+                            <div style="position:absolute;bottom:-20px;left:8px;font-size:10px;color:#9ca3af;">0</div>
+                            <div style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:10px;color:#9ca3af;">50</div>
+                            <div style="position:absolute;bottom:-20px;right:8px;font-size:10px;color:#9ca3af;">100+</div>
                         </div>
 
                         {{-- Durum / Buton --}}

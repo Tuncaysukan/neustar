@@ -4,17 +4,17 @@
 @section('meta_description', 'Aradığınız sayfa bulunamadı.')
 
 @section('content')
-<section class="min-h-[70vh] flex items-center justify-center px-4 py-16">
+<section class="min-h-[70vh] flex items-center justify-center px-4 py-8">
     <div class="w-full max-w-lg text-center">
 
         {{-- 404 büyük yazı --}}
         <div class="relative inline-block">
-            <span class="text-[120px] sm:text-[160px] font-black leading-none select-none"
+            <span class="text-[100px] sm:text-[160px] font-black leading-none select-none"
                   style="color: transparent; -webkit-text-stroke: 2px #1bb6ad; opacity: 0.15;">
                 404
             </span>
             <div class="absolute inset-0 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 text-primary" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -23,16 +23,16 @@
         </div>
 
         {{-- Başlık --}}
-        <h1 class="mt-4 text-2xl sm:text-3xl font-bold tracking-tight">
+        <h1 class="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-center">
             Sayfa bulunamadı
         </h1>
-        <p class="mt-3 text-sm sm:text-base text-base-content/60 leading-relaxed max-w-sm mx-auto">
+        <p class="mt-3 text-sm sm:text-base text-base-content/60 leading-relaxed max-w-sm mx-auto text-center">
             Aradığınız sayfa taşınmış, silinmiş ya da hiç var olmamış olabilir.
             Aşağıdaki bağlantılardan devam edebilirsiniz.
         </p>
 
         {{-- Hızlı linkler --}}
-        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a href="{{ route('home') }}" class="btn btn-primary">
                 Ana Sayfaya Dön
             </a>
@@ -45,8 +45,8 @@
         </div>
 
         {{-- Arama kutusu --}}
-        <div class="mt-10 max-w-sm mx-auto">
-            <p class="text-xs text-base-content/45 mb-3">Veya paket arayın:</p>
+        <div class="mt-8 max-w-sm mx-auto">
+            <p class="text-xs text-base-content/45 mb-2 text-center">Veya paket arayın:</p>
             <form action="{{ route('packages.index') }}" method="GET" class="flex gap-2">
                 <input type="text" name="q"
                        placeholder="Operatör veya paket adı…"
@@ -56,8 +56,8 @@
         </div>
 
         {{-- Popüler sayfalar --}}
-        <div class="mt-10 pt-8 border-t border-base-300">
-            <p class="text-xs font-semibold uppercase tracking-wider text-base-content/40 mb-4">
+        <div class="mt-8 pt-6 border-t border-base-300">
+            <p class="text-xs font-semibold uppercase tracking-wider text-base-content/40 mb-3 text-center">
                 Popüler sayfalar
             </p>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">

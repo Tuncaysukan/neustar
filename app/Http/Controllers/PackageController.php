@@ -139,7 +139,7 @@ class PackageController extends Controller
             || ! empty($infras)
             || ! empty($speeds)
             || ! empty($modems)
-            || in_array($commitment, ['0', '1'], true)
+            || in_array($commitment, ['0', '1', 'taahhütsüz', 'taahhutlu'], true)
             || $filters['price_min'] !== null
             || $filters['price_max'] !== null
             ;

@@ -42,8 +42,11 @@ Route::get('/internet-tarifeleri/{citySlug}/{urlSlug}', [\App\Http\Controllers\T
     ->name('tariffs.district');
 Route::post('/internet-paketleri/{slug}/yorum', [\App\Http\Controllers\PackageReviewController::class, 'store'])->name('packages.reviews.store');
 Route::get('/karsilastir', [\App\Http\Controllers\CompareController::class, 'index'])->name('compare');
-Route::get('/markalar', [\App\Http\Controllers\HomeController::class, 'operators'])->name('operators.index');
-Route::get('/markalar/{slug}', [\App\Http\Controllers\HomeController::class, 'operatorDetail'])->name('operators.show');
+Route::get('/internet-servis-saglayici', [\App\Http\Controllers\HomeController::class, 'operators'])->name('operators.index');
+Route::get('/internet-servis-saglayici/{slug}', [\App\Http\Controllers\HomeController::class, 'operatorDetail'])->name('operators.show');
+// Eski /markalar URL'leri için 301 redirect
+Route::get('/markalar', fn() => redirect()->route('operators.index', status: 301));
+Route::get('/markalar/{slug}', fn(string $slug) => redirect()->route('operators.show', $slug, 301));
 
 Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{categorySlug}', [\App\Http\Controllers\BlogController::class, 'categoryIndex'])->name('blog.category');

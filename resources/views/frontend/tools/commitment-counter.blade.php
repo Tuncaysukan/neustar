@@ -128,7 +128,7 @@
 
                         {{-- Sonuç --}}
                         <div class="mt-6" x-show="result" x-transition x-cloak>
-                            <div class="rounded-xl bg-base-200 border border-base-300 p-6">
+                            <div class="rounded-xl bg-base-100 border border-base-300 p-6">
 
                                 {{-- Kadran + bilgi yan yana --}}
                                 <div class="flex flex-col sm:flex-row items-center gap-6">
@@ -145,7 +145,7 @@
                                             {{-- İlerleme halkası (kalan süre) --}}
                                             <circle cx="80" cy="80" r="60"
                                                     fill="none"
-                                                    stroke="#1bb6ad"
+                                                    stroke="#3f475f"
                                                     stroke-width="14"
                                                     stroke-linecap="round"
                                                     :stroke-dasharray="`${377 * Math.min(1, result ? result.diffDays / (Number(months) * 30) : 0)} 377`"
@@ -174,15 +174,16 @@
                                         <div class="flex items-center justify-between rounded-lg px-4 py-3"
                                              :class="result && result.diffDays <= 30 ? 'bg-error/10 border border-error/30' :
                                                      result && result.diffDays <= 90 ? 'bg-warning/10 border border-warning/30' :
-                                                     'bg-success/10 border border-success/30'">
+                                                     'border border-base-300'"
+                                             :style="result && result.diffDays > 90 ? 'background: rgba(63,71,95,0.08)' : ''">
                                             <span class="text-xs font-semibold uppercase tracking-wider"
                                                   :class="result && result.diffDays <= 30 ? 'text-error' :
-                                                          result && result.diffDays <= 90 ? 'text-warning' :
-                                                          'text-success'">Durum</span>
+                                                          result && result.diffDays <= 90 ? 'text-warning' : ''"
+                                                  :style="result && result.diffDays > 90 ? 'color:#3f475f' : ''">Durum</span>
                                             <span class="text-xs font-bold"
                                                   :class="result && result.diffDays <= 30 ? 'text-error' :
-                                                          result && result.diffDays <= 90 ? 'text-warning' :
-                                                          'text-success'"
+                                                          result && result.diffDays <= 90 ? 'text-warning' : ''"
+                                                  :style="result && result.diffDays > 90 ? 'color:#3f475f' : ''"
                                                   x-text="result && result.diffDays === 0 ? 'Taahhüt bitti!' :
                                                            result && result.diffDays <= 30 ? 'Bitiyor — Hemen karşılaştır!' :
                                                            result && result.diffDays <= 90 ? 'Yaklaşıyor — Kampanyaları tara' :
