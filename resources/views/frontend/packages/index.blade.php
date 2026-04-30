@@ -437,7 +437,8 @@
 
                                 <div class="shrink-0 md:self-center flex flex-col items-end w-full md:w-auto">
                                     @php
-                                        $btnUrl = ($package->apply_type ?? 'form') === 'site' ? ($package->external_url ?? 'https://www.enuygunfinans.com/internet-baglantilari/') : (($package->apply_type ?? '') === 'call' ? 'tel:'.$package->call_number : route('packages.apply', $package->slug));
+                                        // Her zaman packages.apply üzerinden geç — yönlendirme sayfası orada yönetilir
+                                        $btnUrl = route('packages.apply', $package->slug);
                                     @endphp
                                     <a href="{{ $btnUrl }}" class="btn rounded whitespace-nowrap w-full md:w-[160px] justify-center h-[70px] min-h-[70px] px-3 text-[13px] leading-none shrink-0 btn-primary focus-visible:outline-none focus-visible:ring-2">
                                         Hemen başvur

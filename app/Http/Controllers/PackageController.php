@@ -192,6 +192,15 @@ class PackageController extends Controller
             return redirect()->to('tel:' . $package->call_number);
         }
 
+        // apply_type = 'form' veya null → operatör sitesi varsa yönlendirme sayfası, yoksa form
+        $target = $package->affiliate_url ?: $package->operator->website_url;
+        if ($target) {
+            return view('frontend.packages.redirect', [
+                'package' => $package,
+                'target'  => $target,
+            ]);
+        }
+
         return view('frontend.packages.apply_form', compact('package'));
     }
 
