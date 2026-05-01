@@ -122,6 +122,27 @@ class TariffController extends Controller
             TariffSeoContent::districtKey($citySlug, $districtSlug)
         )->first();
 
+        // $seo yoksa meta template'den render et
+        $metaFromTemplate = [];
+        if (! $seo) {
+            $tpl = \App\Models\LocationMetaTemplate::defaultDistrict();
+            if ($tpl) {
+                $metaFromTemplate = $tpl->render($cityName, $citySlug, $districtName, $districtSlug);
+            }
+        }
+
+        // Genel SSS'ler ($seo'da özel SSS yoksa)
+        $generalFaqs = collect();
+        if (! $seo || empty($seo->faqs)) {
+            $generalFaqs = \App\Models\Faq::where('is_active', true)
+                ->where(function ($q) {
+                    $q->where('page_type', 'location')
+                      ->orWhere('page_type', 'general');
+                })
+                ->orderBy('order')
+                ->get();
+        }
+
         // Paketler
         $packages = $this->getPackagesForCity($citySlug);
 
@@ -137,6 +158,8 @@ class TariffController extends Controller
             'operators',
             'seo',
             'urlSlug',
+            'metaFromTemplate',
+            'generalFaqs',
         ));
     }
 

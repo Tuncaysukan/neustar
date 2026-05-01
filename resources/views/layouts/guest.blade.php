@@ -27,7 +27,7 @@
     </header>
 
     {{-- Content --}}
-    <main class="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
+   a <main class="min-h-[calc(100vh-64px)] flex items-center justify-center px-4 py-12">
         <div class="w-full max-w-md">
             {{ $slot }}
         </div>

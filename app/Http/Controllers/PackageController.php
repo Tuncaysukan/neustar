@@ -157,9 +157,18 @@ class PackageController extends Controller
 
         $faqs = Faq::where('is_active', true)
             ->where(function ($query) use ($package) {
-                $query->where('page_type', 'package')
-                      ->where('relation_id', $package->id)
-                      ->orWhere('page_type', 'general');
+                // Bu pakete özel SSS'ler
+                $query->where(function ($q) use ($package) {
+                    $q->where('page_type', 'package')
+                      ->where('relation_id', $package->id);
+                })
+                // Genel SSS'ler (tüm sayfalarda göster)
+                ->orWhere('page_type', 'general')
+                // Operatöre özel SSS'ler
+                ->orWhere(function ($q) use ($package) {
+                    $q->where('page_type', 'operator')
+                      ->where('relation_id', $package->operator_id);
+                });
             })
             ->orderBy('order')
             ->get();

@@ -27,7 +27,6 @@
                 <div class="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">İçerik</div>
                 <a href="{{ route('admin.operators.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.operators.*') ? 'bg-gray-700' : '' }}">Operatörler</a>
                 <a href="{{ route('admin.packages.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.packages.*') ? 'bg-gray-700' : '' }}">Paketler</a>
-                <a href="{{ route('admin.sponsors.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.sponsors.*') ? 'bg-gray-700' : '' }}">Sponsorlar</a>
                 <a href="{{ route('admin.blogs.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.blogs.*') ? 'bg-gray-700' : '' }}">Blog</a>
                 <a href="{{ route('admin.faqs.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.faqs.*') ? 'bg-gray-700' : '' }}">SSS</a>
                 @php($pendingReviews = \App\Models\PackageReview::where('is_approved', false)->count())
@@ -39,7 +38,6 @@
                 </a>
 
                 <div class="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">Başvurular</div>
-                <a href="{{ route('admin.infrastructure.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.infrastructure.*') ? 'bg-gray-700' : '' }}">Altyapı Durumu</a>
                 @php($pendingLeads = \Illuminate\Support\Facades\Cache::remember('admin.leads.pending', 60, fn () => \App\Models\InfrastructureLead::where('status', 'new')->count()))
                 <a href="{{ route('admin.infrastructure-leads.index') }}" class="flex items-center justify-between px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.infrastructure-leads.*') ? 'bg-gray-700' : '' }}">
                     <span>Başvurular</span>

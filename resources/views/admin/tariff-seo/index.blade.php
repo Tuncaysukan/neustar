@@ -47,16 +47,15 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($items as $item)
                         @php
-                            use App\Models\TariffSeoContent;
                             $isDistrict = (bool) $item->district_slug;
                             if ($isDistrict) {
                                 $pageUrl = route('tariffs.district', [
                                     'citySlug' => $item->city_slug,
-                                    'urlSlug'  => TariffSeoContent::districtUrlSlug($item->district_slug),
+                                    'urlSlug'  => \App\Models\TariffSeoContent::districtUrlSlug($item->district_slug),
                                 ]);
                             } else {
                                 $pageUrl = route('tariffs.city', [
-                                    'urlSlug' => TariffSeoContent::cityUrlSlug($item->city_slug),
+                                    'urlSlug' => \App\Models\TariffSeoContent::cityUrlSlug($item->city_slug),
                                 ]);
                             }
                         @endphp
