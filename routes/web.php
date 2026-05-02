@@ -89,6 +89,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('operators', \App\Http\Controllers\Admin\OperatorController::class);
     Route::resource('packages', \App\Http\Controllers\Admin\InternetPackageController::class);
+    Route::get('packages-export', [\App\Http\Controllers\Admin\InternetPackageController::class, 'export'])
+        ->name('packages.export');
     Route::resource('sponsors', \App\Http\Controllers\Admin\SponsorController::class);
     Route::resource('blogs', \App\Http\Controllers\Admin\BlogController::class);
     Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class);
@@ -124,6 +126,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except(['show']);
     Route::get('infrastructure-leads', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'index'])
         ->name('infrastructure-leads.index');
+    Route::get('infrastructure-leads/export', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'export'])
+        ->name('infrastructure-leads.export');
     Route::get('infrastructure-leads/{lead}', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'show'])
         ->name('infrastructure-leads.show');
     Route::patch('infrastructure-leads/{lead}', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'update'])

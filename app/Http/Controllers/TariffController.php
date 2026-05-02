@@ -172,7 +172,7 @@ class TariffController extends Controller
             ->where('is_active', true)
             ->where(function ($q) use ($citySlug) {
                 $q->whereNull('available_provinces')
-                  ->orWhereJsonContains('available_provinces', $citySlug);
+                  ->orWhere('available_provinces', 'like', '%"' . addslashes($citySlug) . '"%');
             })
             ->orderByDesc('is_sponsored')
             ->orderBy('price')

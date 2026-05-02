@@ -30,6 +30,89 @@
             <a href="{{ route('admin.packages.index') }}" class="mt-3 text-xs text-blue-600 hover:underline block">Paketleri yönet →</a>
         </div>
 
+        {{-- Tıklama sayacı --}}
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-indigo-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Operatör Yönlendirme</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ number_format($stats['total_clicks']) }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        <span class="text-indigo-600 font-medium">Bugün: {{ $stats['clicks_today'] }}</span>
+                        · Bu hafta: {{ $stats['clicks_this_week'] }}
+                    </p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-indigo-50 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{{ route('admin.packages.index') }}" class="mt-3 text-xs text-indigo-600 hover:underline block">Paket tıklamalarını gör →</a>
+        </div>
+
+        {{-- Blog --}}
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-pink-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Blog Yazıları</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['total_blogs'] }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        <span class="text-pink-600 font-medium">{{ $stats['published_blogs'] }} yayında</span>
+                    </p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-pink-50 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{{ route('admin.blogs.index') }}" class="mt-3 text-xs text-pink-600 hover:underline block">Blog yazılarını yönet →</a>
+        </div>
+
+        {{-- Taahhüt Hatırlatıcı --}}
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Taahhüt Hatırlatıcı</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ $stats['commitment_reminders'] }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        @if($stats['commitment_expiring'] > 0)
+                            <span class="text-yellow-600 font-medium">{{ $stats['commitment_expiring'] }} yakında bitiyor</span>
+                        @else
+                            <span class="text-gray-400">Yakında biten yok</span>
+                        @endif
+                    </p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-yellow-50 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{{ route('admin.commitment-reminders.index') }}" class="mt-3 text-xs text-yellow-600 hover:underline block">Hatırlatıcıları gör →</a>
+        </div>
+
+        {{-- Ziyaretçi --}}
+        <div class="bg-white rounded-lg shadow p-5 border-l-4 border-teal-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Site Ziyaretçisi</p>
+                    <p class="text-3xl font-bold text-gray-800 mt-1">{{ number_format($stats['visitors_month']) }}</p>
+                    <p class="text-xs text-gray-400 mt-1">
+                        <span class="text-teal-600 font-medium">Bugün: {{ $stats['visitors_today'] }}</span>
+                        · Hafta: {{ number_format($stats['visitors_week']) }}
+                    </p>
+                </div>
+                <div class="h-12 w-12 rounded-full bg-teal-50 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                </div>
+            </div>
+            <p class="mt-3 text-xs text-gray-400">Bu ay toplam sayfa görüntüleme</p>
+        </div>
+
         {{-- Operatörler --}}
         <div class="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
             <div class="flex items-center justify-between">
@@ -112,21 +195,13 @@
                 <h3 class="text-sm font-bold text-gray-700">Son 7 Günlük Başvurular</h3>
                 <span class="text-xs text-gray-400">Bu hafta: {{ $stats['leads_this_week'] }}</span>
             </div>
-
-            @php
-                $maxCount = $leadChart->max('count') ?: 1;
-            @endphp
-
+            @php $maxCount = $leadChart->max('count') ?: 1; @endphp
             <div class="flex items-end gap-2 h-32">
                 @foreach($leadChart as $day)
                     @php $pct = $maxCount > 0 ? ($day['count'] / $maxCount) * 100 : 0; @endphp
                     <div class="flex-1 flex flex-col items-center gap-1">
-                        <span class="text-[10px] font-semibold text-gray-600">
-                            {{ $day['count'] > 0 ? $day['count'] : '' }}
-                        </span>
-                        <div class="w-full rounded-t-sm transition-all"
-                             style="height: {{ max(4, $pct * 0.9) }}px; background: {{ $pct > 0 ? '#3b82f6' : '#e5e7eb' }};">
-                        </div>
+                        <span class="text-[10px] font-semibold text-gray-600">{{ $day['count'] > 0 ? $day['count'] : '' }}</span>
+                        <div class="w-full rounded-t-sm" style="height: {{ max(4, $pct * 0.9) }}px; background: {{ $pct > 0 ? '#3b82f6' : '#e5e7eb' }};"></div>
                         <span class="text-[9px] text-gray-400 whitespace-nowrap">{{ $day['label'] }}</span>
                     </div>
                 @endforeach
@@ -154,6 +229,48 @@
                     @endforeach
                 </div>
             @endif
+        </div>
+    </div>
+
+    {{-- ── Ziyaretçi grafiği (son 30 gün) ── --}}
+    <div class="bg-white rounded-lg shadow p-5">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="text-sm font-bold text-gray-700">Site Ziyaretçileri — Son 30 Gün</h3>
+                <p class="text-xs text-gray-400 mt-0.5">Sayfa görüntüleme sayısı (bot hariç)</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <div class="text-center">
+                    <div class="font-bold text-teal-600 text-base">{{ number_format($stats['visitors_today']) }}</div>
+                    <div class="text-gray-400">Bugün</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-teal-600 text-base">{{ number_format($stats['visitors_week']) }}</div>
+                    <div class="text-gray-400">Bu hafta</div>
+                </div>
+                <div class="text-center">
+                    <div class="font-bold text-teal-600 text-base">{{ number_format($stats['visitors_month']) }}</div>
+                    <div class="text-gray-400">Bu ay</div>
+                </div>
+            </div>
+        </div>
+
+        @php $maxV = $visitorChart->max('count') ?: 1; @endphp
+        <div class="flex items-end gap-1 h-28">
+            @foreach($visitorChart as $i => $day)
+                @php $pct = ($day['count'] / $maxV) * 100; @endphp
+                <div class="flex-1 flex flex-col items-center gap-0.5 group relative">
+                    <div class="w-full rounded-t transition-all"
+                         style="height: {{ max(2, $pct * 0.9) }}px; background: {{ $pct > 0 ? '#14b8a6' : '#e5e7eb' }}; opacity: {{ $pct > 0 ? '0.8' : '1' }};">
+                    </div>
+                    {{-- Her 5 günde bir etiket --}}
+                    @if($i % 5 === 0)
+                        <span class="text-[8px] text-gray-400 whitespace-nowrap">{{ $day['label'] }}</span>
+                    @else
+                        <span class="text-[8px] text-transparent">·</span>
+                    @endif
+                </div>
+            @endforeach
         </div>
     </div>
 

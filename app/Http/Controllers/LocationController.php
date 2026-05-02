@@ -203,7 +203,7 @@ class LocationController extends Controller
             ->where('is_active', true)
             ->where(function ($q) use ($city) {
                 $q->whereNull('available_provinces')
-                  ->orWhereJsonContains('available_provinces', $city);
+                  ->orWhere('available_provinces', 'like', '%"' . addslashes($city) . '"%');
             })
             ->orderByDesc('is_sponsored')
             ->orderBy('price')

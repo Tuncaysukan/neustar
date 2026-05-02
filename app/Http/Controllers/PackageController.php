@@ -187,6 +187,15 @@ class PackageController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
+        // Tıklama sayacı — DB'ye log + increment
+        \App\Models\PackageClick::create([
+            'internet_package_id' => $package->id,
+            'ip'                  => request()->ip(),
+            'user_agent'          => substr((string) request()->userAgent(), 0, 255),
+            'referer'             => substr((string) request()->header('referer', ''), 0, 500),
+        ]);
+        $package->increment('click_count');
+
         if ($package->apply_type === 'site') {
             $target = $package->external_url ?: $package->operator->website_url;
             if ($target) {

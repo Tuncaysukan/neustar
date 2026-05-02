@@ -30,6 +30,7 @@ class InternetPackage extends Model
         'apply_type',
         'external_url',
         'call_number',
+        'click_count',
     ];
 
     protected $casts = [
@@ -48,5 +49,10 @@ class InternetPackage extends Model
     public function reviews()
     {
         return $this->hasMany(PackageReview::class, 'internet_package_id');
+    }
+
+    public function clicks()
+    {
+        return $this->hasMany(\App\Models\PackageClick::class, 'internet_package_id');
     }
 }

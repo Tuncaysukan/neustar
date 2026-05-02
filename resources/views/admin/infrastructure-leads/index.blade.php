@@ -12,31 +12,81 @@
     @endif
 
     <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="p-4 border-b flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-                <h3 class="text-lg font-bold">Gelen başvurular</h3>
-                <p class="text-xs text-gray-500 mt-1">
-                    Kullanıcılar altyapı sorgusu sonrası "beni arayın" formuyla bırakıyor.
-                </p>
+        <div class="p-4 border-b">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                <div>
+                    <h3 class="text-lg font-bold">Gelen başvurular</h3>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Kullanıcılar altyapı sorgusu sonrası "beni arayın" formuyla bırakıyor.
+                    </p>
+                </div>
+                {{-- Excel Export --}}
+                <a href="{{ route('admin.infrastructure-leads.export', array_filter(['q' => $q, 'status' => $status, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'operator_id' => request('operator_id')])) }}"
+                   class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Excel İndir
+                </a>
             </div>
 
+            {{-- Filtreler --}}
             <form method="GET" action="{{ route('admin.infrastructure-leads.index') }}"
-                  class="flex items-center gap-2">
-                <select name="status" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Tüm durumlar</option>
-                    @foreach($statusLabels as $key => $label)
-                        <option value="{{ $key }}" @selected($status === $key)>
-                            {{ $label }} ({{ $counts[$key] ?? 0 }})
-                        </option>
-                    @endforeach
-                </select>
+                  class="space-y-2">
 
-                <input type="search" name="q" value="{{ $q }}"
-                       placeholder="Ad / telefon / il ara"
-                       class="border-gray-300 rounded-md shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+                {{-- Satır 1: Arama + Durum + Operatör --}}
+                <div class="flex flex-wrap gap-2">
+                    <input type="search" name="q" value="{{ $q }}"
+                           placeholder="Ad / telefon / il ara"
+                           class="border-gray-300 rounded-md shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500 flex-1 min-w-[160px]">
 
-                <button type="submit" class="bg-gray-800 text-white px-3 py-2 rounded text-sm">Filtrele</button>
+                    <select name="status" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Tüm durumlar</option>
+                        @foreach($statusLabels as $key => $label)
+                            <option value="{{ $key }}" @selected($status === $key)>
+                                {{ $label }} ({{ $counts[$key] ?? 0 }})
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <select name="operator_id" class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Tüm operatörler</option>
+                        @foreach($operators as $op)
+                            <option value="{{ $op->id }}" @selected(request('operator_id') == $op->id)>{{ $op->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Satır 2: Tarih + Butonlar --}}
+                <div class="flex flex-wrap items-center gap-2">
+                    <label class="text-xs text-gray-500 whitespace-nowrap">Tarih aralığı:</label>
+                    <input type="date" name="date_from" value="{{ $dateFrom }}"
+                           class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <span class="text-gray-400 text-xs">—</span>
+                    <input type="date" name="date_to" value="{{ $dateTo }}"
+                           class="border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500">
+
+                    <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded text-sm">Filtrele</button>
+                    @if($q || $status || $dateFrom || $dateTo || request('operator_id'))
+                        <a href="{{ route('admin.infrastructure-leads.index') }}"
+                           class="px-3 py-2 rounded text-sm bg-gray-100 text-gray-600 hover:bg-gray-200">
+                            Temizle
+                        </a>
+                    @endif
+                </div>
             </form>
+
+            {{-- Aktif filtre özeti --}}
+            @if($dateFrom || $dateTo || request('operator_id'))
+            <div class="mt-2 text-xs text-blue-700 bg-blue-50 rounded px-3 py-1.5 flex flex-wrap gap-3">
+                @if(request('operator_id'))
+                    @php $selectedOp = $operators->firstWhere('id', request('operator_id')); @endphp
+                    @if($selectedOp) <span>🏢 Operatör: <strong>{{ $selectedOp->name }}</strong></span> @endif
+                @endif
+                @if($dateFrom) <span>📅 Başlangıç: <strong>{{ \Carbon\Carbon::parse($dateFrom)->format('d.m.Y') }}</strong></span> @endif
+                @if($dateTo) <span>📅 Bitiş: <strong>{{ \Carbon\Carbon::parse($dateTo)->format('d.m.Y') }}</strong></span> @endif
+            </div>
+            @endif
         </div>
 
         <table class="min-w-full divide-y divide-gray-200">
