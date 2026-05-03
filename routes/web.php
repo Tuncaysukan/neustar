@@ -17,7 +17,10 @@ Route::get('/taahhut-sayaci', [\App\Http\Controllers\HomeController::class, 'com
 Route::post('/taahhut-sayaci/hatirlatici', [\App\Http\Controllers\HomeController::class, 'commitmentReminderStore'])
     ->middleware('throttle:10,1')
     ->name('commitment-counter.reminder');
-Route::post('/iletisim', [\App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
+Route::get('/iletisim', [\App\Http\Controllers\ContactController::class, 'show'])->name('contact');
+Route::post('/iletisim', [\App\Http\Controllers\ContactController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('contact.store');
 
 Route::get('/internet-paketleri', [\App\Http\Controllers\PackageController::class, 'index'])->name('packages.index');
 Route::get('/internet-paketleri/{operatorSlug}', [\App\Http\Controllers\PackageController::class, 'index'])
@@ -134,6 +137,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->name('infrastructure-leads.update');
     Route::delete('infrastructure-leads/{lead}', [\App\Http\Controllers\Admin\InfrastructureLeadController::class, 'destroy'])
         ->name('infrastructure-leads.destroy');
+
+    Route::get('contact-messages', [\App\Http\Controllers\Admin\ContactMessageController::class, 'index'])
+        ->name('contact-messages.index');
+    Route::get('contact-messages/{contact_message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'show'])
+        ->name('contact-messages.show');
+    Route::delete('contact-messages/{contact_message}', [\App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])
+        ->name('contact-messages.destroy');
 });
 
 Route::middleware('auth')->group(function () {

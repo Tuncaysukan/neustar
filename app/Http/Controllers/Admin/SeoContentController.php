@@ -50,8 +50,12 @@ class SeoContentController extends Controller
             'meta_description' => 'nullable',
         ]);
 
+        $previousKey = $seo->page_key;
         $seo->update($validated);
-        \App\Models\SeoContent::clearCache($seo->page_key);
+        \App\Models\SeoContent::clearCache($validated['page_key']);
+        if ($previousKey !== $validated['page_key']) {
+            \App\Models\SeoContent::clearCache($previousKey);
+        }
 
         return redirect()->route('admin.seo.index')->with('success', 'SEO içeriği başarıyla güncellendi.');
     }

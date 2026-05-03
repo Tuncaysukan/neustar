@@ -75,7 +75,7 @@ class InternetPackageController extends Controller
 
             fputcsv($handle, [
                 'ID', 'Operatör', 'Paket Adı', 'Fiyat (TL)', 'Hız (Mbps)',
-                'Taahhüt (Ay)', 'Altyapı', 'Kota', 'Tıklama', 'Sponsor', 'Aktif', 'Oluşturulma',
+                'Taahhüt (Ay)', 'Altyapı', 'Kota', 'Müşteri', 'Tıklama', 'Sponsor', 'Aktif', 'Oluşturulma',
             ], ';');
 
             foreach ($packages as $p) {
@@ -88,6 +88,7 @@ class InternetPackageController extends Controller
                     $p->commitment_period > 0 ? $p->commitment_period : 'Yok',
                     $p->infrastructure_type ?? '',
                     $p->quota,
+                    $p->customer_segment ?? 'both',
                     $p->clicks_count ?? $p->click_count,
                     $p->is_sponsored ? 'Evet' : 'Hayır',
                     $p->is_active ? 'Aktif' : 'Pasif',
@@ -128,6 +129,7 @@ class InternetPackageController extends Controller
             'is_active'           => 'boolean',
             'is_sponsored'        => 'boolean',
             'apply_type'          => 'required|in:site,call,form',
+            'customer_segment'    => 'required|in:both,bireysel,kurumsal',
             'external_url'        => 'nullable|url|max:500',
             'call_number'         => 'nullable|max:32',
         ]);
@@ -166,6 +168,7 @@ class InternetPackageController extends Controller
             'is_active'           => 'boolean',
             'is_sponsored'        => 'boolean',
             'apply_type'          => 'required|in:site,call,form',
+            'customer_segment'    => 'required|in:both,bireysel,kurumsal',
             'external_url'        => 'nullable|url|max:500',
             'call_number'         => 'nullable|max:32',
         ]);

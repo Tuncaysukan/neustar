@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', \App\Models\SiteSetting::get('meta_title', config('app.name', 'Neustar')))</title>
-    <meta name="description" content="@yield('meta_description', \App\Models\SiteSetting::get('meta_description', 'İnternet paketlerini karşılaştır, en uygununu seç.'))">
+    <title>{{ ($pageSeo && $pageSeo->meta_title) ? $pageSeo->meta_title : trim($__env->yieldContent('title', \App\Models\SiteSetting::get('meta_title', config('app.name', 'Neustar')))) }}</title>
+    <meta name="description" content="{{ ($pageSeo && $pageSeo->meta_description) ? $pageSeo->meta_description : trim($__env->yieldContent('meta_description', \App\Models\SiteSetting::get('meta_description', 'İnternet paketlerini karşılaştır, en uygununu seç.'))) }}">
+
+    @if(!empty($layoutSite['google_analytics']))
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $layoutSite['google_analytics'] }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', @json($layoutSite['google_analytics']));
+        </script>
+    @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +138,20 @@
 
             {{-- ============ Main ============ --}}
             <main class="min-h-[calc(100vh-64px)]">
+                @if($pageSeo && ($pageSeo->title || $pageSeo->content))
+                    <div class="border-b border-base-300 bg-base-100/80">
+                        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                            @if($pageSeo->title)
+                                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-base-content">{{ $pageSeo->title }}</h1>
+                            @endif
+                            @if($pageSeo->content)
+                                <div class="mt-3 prose prose-sm max-w-none text-base-content/80 [&_a]:link [&_a]:link-primary">
+                                    {!! $pageSeo->content !!}
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
                 @yield('content')
             </main>
 
@@ -150,8 +174,33 @@
                                     loading="lazy" />
                             </a>
                             <p class="mt-4 text-sm leading-relaxed text-neutral-content/70 max-w-md">
-                                İnternet paketlerini tek ekranda karşılaştır. Fiyat, hız ve taahhüt süresini yan yana gör.
+                                {{ $layoutSite['site_tagline'] !== '' ? $layoutSite['site_tagline'] : 'İnternet paketlerini tek ekranda karşılaştır. Fiyat, hız ve taahhüt süresini yan yana gör.' }}
                             </p>
+                            @if($layoutSite['contact_email'] || $layoutSite['contact_phone'])
+                                <div class="mt-4 space-y-1 text-sm text-neutral-content/75">
+                                    @if($layoutSite['contact_email'])
+                                        <div><a class="hover:text-neutral-content" href="mailto:{{ $layoutSite['contact_email'] }}">{{ $layoutSite['contact_email'] }}</a></div>
+                                    @endif
+                                    @if($layoutSite['contact_phone'])
+                                        <div><a class="hover:text-neutral-content" href="tel:{{ preg_replace('/\s+/', '', $layoutSite['contact_phone']) }}">{{ $layoutSite['contact_phone'] }}</a></div>
+                                    @endif
+                                </div>
+                            @endif
+                            @php
+                                $socials = array_filter([
+                                    'Facebook' => $layoutSite['facebook_url'],
+                                    'X' => $layoutSite['twitter_url'],
+                                    'Instagram' => $layoutSite['instagram_url'],
+                                    'YouTube' => $layoutSite['youtube_url'],
+                                ]);
+                            @endphp
+                            @if(count($socials) > 0)
+                                <div class="mt-4 flex flex-wrap gap-3 text-xs">
+                                    @foreach($socials as $label => $url)
+                                        <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="text-neutral-content/70 hover:text-neutral-content underline-offset-2 hover:underline">{{ $label }}</a>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
 
                         <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
@@ -176,7 +225,7 @@
                                 <ul class="mt-4 space-y-2.5 text-sm text-neutral-content/70">
                                     <li><a class="hover:text-neutral-content" href="#">KVKK</a></li>
                                     <li><a class="hover:text-neutral-content" href="#">Çerezler</a></li>
-                                    <li><a class="hover:text-neutral-content" href="#">İletişim</a></li>
+                                    <li><a class="hover:text-neutral-content" href="{{ route('contact') }}">İletişim</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -212,8 +261,8 @@
                     @endif
 
                     <div class="mt-10 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between text-xs text-neutral-content/55">
-                        <p>&copy; {{ date('Y') }} Netkarsilastir.com  Tüm hakları saklıdır.</p>
-                        <p>Sitemizdeki operatör logoları ve markaları, bilgilendirme ve karşılaştırma amacıyla adil kullanım çerçevesinde sunulmaktadır. Tüm marka hakları ve mülkiyetleri ilgili kuruluşlara aittir. </p>
+                        <p>{{ $layoutSite['footer_copyright'] !== '' ? $layoutSite['footer_copyright'] : '© ' . date('Y') . ' Netkarsilastir.com — Tüm hakları saklıdır.' }}</p>
+                        <p>Sitemizdeki operatör logoları ve markaları, bilgilendirme ve karşılaştırma amacıyla adil kullanım çerçevesinde sunulmaktadır. Tüm marka hakları ve mülkiyetleri ilgili kuruluşlara aittir.</p>
                     </div>
                 </div>
             </footer>

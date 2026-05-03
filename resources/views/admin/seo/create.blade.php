@@ -15,18 +15,23 @@
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Sayfa Anahtarı (home, speed_test vb.)</label>
-                        <input type="text" name="page_key" value="{{ old('page_key', $seo->page_key ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required {{ isset($seo) ? 'readonly' : '' }}>
+                        <label class="block text-sm font-medium text-gray-700">Sayfa anahtarı</label>
+                        <input type="text" name="page_key" value="{{ old('page_key', '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Laravel <strong>route adı</strong> kullanın (örn. <code class="bg-gray-100 px-1 rounded">home</code>, <code class="bg-gray-100 px-1 rounded">packages.index</code>, <code class="bg-gray-100 px-1 rounded">contact</code>).
+                            Paket listesinin tüm URL varyantları için yalnızca <code class="bg-gray-100 px-1 rounded">packages.index</code> kaydı yeterlidir.
+                            Footer metni için: <code class="bg-gray-100 px-1 rounded">footer_disclaimer</code> (sayfa üst bloğunda gösterilmez).
+                        </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Görünür Başlık (H1)</label>
-                        <input type="text" name="title" value="{{ old('title', $seo->title ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <input type="text" name="title" value="{{ old('title', '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Sayfa İçi İçerik (SEO Metni / Disclaimer)</label>
-                    <textarea name="content" rows="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('content', $seo->content ?? '') }}</textarea>
+                    <textarea name="content" rows="6" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('content', '') }}</textarea>
                 </div>
 
                 <div class="border-t pt-6">
@@ -34,11 +39,11 @@
                     <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Meta Başlık (Title Tag)</label>
-                            <input type="text" name="meta_title" value="{{ old('meta_title', $seo->meta_title ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" name="meta_title" value="{{ old('meta_title', '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Meta Açıklama (Description)</label>
-                            <textarea name="meta_description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('meta_description', $seo->meta_description ?? '') }}</textarea>
+                            <textarea name="meta_description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('meta_description', '') }}</textarea>
                         </div>
                     </div>
                 </div>

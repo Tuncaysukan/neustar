@@ -115,6 +115,17 @@
                 </div>
             </div>
             <p class="mt-2 text-xs text-gray-500">Seçilen tipe göre kullanıcı ilgili aksiyona yönlendirilir.</p>
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700">Hedef müşteri (liste filtresi)</label>
+                @php $seg = old('customer_segment', $p->customer_segment ?? 'both'); @endphp
+                <select name="customer_segment" required
+                        class="mt-1 block w-full max-w-md border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="both" @selected($seg === 'both')>Bireysel ve kurumsal</option>
+                    <option value="bireysel" @selected($seg === 'bireysel')>Yalnızca bireysel</option>
+                    <option value="kurumsal" @selected($seg === 'kurumsal')>Yalnızca kurumsal</option>
+                </select>
+                <p class="mt-1 text-xs text-gray-500">Site üzerindeki &quot;Başvuru tipi&quot; filtresi bu alana göre paketleri daraltır.</p>
+            </div>
         </div>
 
         {{-- Tarife Hakkında --}}

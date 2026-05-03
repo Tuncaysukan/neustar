@@ -60,7 +60,8 @@
                     + count($filters['speed'])
                     + (in_array($filters['commitment'], ['taahhütsüz', 'taahhutlu'], true) ? 1 : 0)
                     + (($filters['price_min'] !== null || $filters['price_max'] !== null) ? 1 : 0)
-                    + count($filters['modem'] ?? []);
+                    + count($filters['modem'] ?? [])
+                    + ($filters['frontend_mode'] ? 1 : 0);
             @endphp
             <aside class="lg:col-span-3"
                    x-data="{
@@ -90,6 +91,9 @@
 
                            let sort = form.querySelector('input[name=sort]');
                            if (sort && sort.value && sort.value !== 'featured') params.append('sort', sort.value);
+
+                           let fm = form.querySelector('input[name=\'frontend_mode\']:checked');
+                           if (fm && fm.value) params.append('frontend_mode', fm.value);
 
                            let base = '{{ route('packages.index') }}';
                            let qs = params.toString();
@@ -248,19 +252,28 @@
                                 </div>
                             </div>
 
-                            {{-- Fiyat --}}
+                            {{-- Başvuru tipi + Fiyat --}}
                             <div class="px-5 py-4">
                                 <div class="text-xs font-semibold uppercase tracking-wider text-base-content/55 mb-3">
                                     Başvuru tipi
                                 </div>
+                                @php $fmSel = $filters['frontend_mode']; @endphp
                                 <div class="space-y-2 mb-3">
                                     <label class="flex items-center gap-2.5 cursor-pointer">
-                                        <input type="radio" name="frontend_mode" value="bireysel" checked
+                                        <input type="radio" name="frontend_mode" value=""
+                                               @checked($fmSel === null)
+                                               class="radio radio-sm radio-primary">
+                                        <span class="text-sm">Tümü</span>
+                                    </label>
+                                    <label class="flex items-center gap-2.5 cursor-pointer">
+                                        <input type="radio" name="frontend_mode" value="bireysel"
+                                               @checked($fmSel === 'bireysel')
                                                class="radio radio-sm radio-primary">
                                         <span class="text-sm">Bireysel</span>
                                     </label>
                                     <label class="flex items-center gap-2.5 cursor-pointer">
                                         <input type="radio" name="frontend_mode" value="kurumsal"
+                                               @checked($fmSel === 'kurumsal')
                                                class="radio radio-sm radio-primary">
                                         <span class="text-sm">Kurumsal</span>
                                     </label>
@@ -345,6 +358,12 @@
 
                         @if($filters['price_min'] !== null || $filters['price_max'] !== null)
                             @include('frontend.packages._filter-chip', ['label' => ($filters['price_min'] ?? '0') . '–' . ($filters['price_max'] ?? '∞') . ' TL', 'remove' => request()->fullUrlWithQuery(['price_min' => null, 'price_max' => null])])
+                        @endif
+
+                        @if($filters['frontend_mode'] === 'bireysel')
+                            @include('frontend.packages._filter-chip', ['label' => 'Bireysel', 'remove' => request()->fullUrlWithQuery(['frontend_mode' => null])])
+                        @elseif($filters['frontend_mode'] === 'kurumsal')
+                            @include('frontend.packages._filter-chip', ['label' => 'Kurumsal', 'remove' => request()->fullUrlWithQuery(['frontend_mode' => null])])
                         @endif
 
                     </div>

@@ -7,20 +7,29 @@ namespace App\Http\Controllers;
 use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ContactController extends Controller
 {
+    public function show(): View
+    {
+        return view('frontend.contact');
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:160'],
+            'name'    => ['required', 'string', 'max:120'],
+            'email'   => ['required', 'email', 'max:160'],
             'subject' => ['nullable', 'string', 'max:120'],
             'message' => ['required', 'string', 'max:5000'],
+            'kvkk'    => ['required', 'accepted'],
         ]);
 
-        ContactMessage::create(array_merge($validated, [
-            'ip' => $request->ip(),
+        $data = collect($validated)->except('kvkk')->all();
+
+        ContactMessage::create(array_merge($data, [
+            'ip'               => $request->ip(),
             'kvkk_approved_at' => now(),
         ]));
 

@@ -16,5 +16,9 @@ class ContactMessage extends Model
         'ip',
         'kvkk_approved_at',
     ];
+
+    protected $casts = [
+        'kvkk_approved_at' => 'datetime',
+    ];
 }
 

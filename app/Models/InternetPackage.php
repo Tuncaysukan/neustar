@@ -28,6 +28,7 @@ class InternetPackage extends Model
         'seo_title',
         'seo_description',
         'apply_type',
+        'customer_segment',
         'external_url',
         'call_number',
         'click_count',

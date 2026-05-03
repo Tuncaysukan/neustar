@@ -15,8 +15,11 @@
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Sayfa Anahtarı (home, speed_test vb.)</label>
+                        <label class="block text-sm font-medium text-gray-700">Sayfa anahtarı</label>
                         <input type="text" name="page_key" value="{{ old('page_key', $seo->page_key ?? '') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required {{ isset($seo) ? 'readonly' : '' }}>
+                        <p class="mt-1 text-xs text-gray-500">
+                            Route adı ile eşleşir; paket listesi için <code class="bg-gray-100 px-1 rounded">packages.index</code>. Footer disclaimer: <code class="bg-gray-100 px-1 rounded">footer_disclaimer</code>.
+                        </p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Görünür Başlık (H1)</label>

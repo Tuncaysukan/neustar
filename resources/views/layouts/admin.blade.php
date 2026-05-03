@@ -46,6 +46,7 @@
                     @endif
                 </a>
                 <a href="{{ route('admin.commitment-reminders.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.commitment-reminders.*') ? 'bg-gray-700' : '' }}">Taahhüt Hatırlatıcı</a>
+                <a href="{{ route('admin.contact-messages.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.contact-messages.*') ? 'bg-gray-700' : '' }}">İletişim Mesajları</a>
 
                 <div class="px-4 pt-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-500">SEO & Ayarlar</div>
                 <a href="{{ route('admin.seo.index') }}" class="block px-4 py-2 hover:bg-gray-700 {{ request()->routeIs('admin.seo.*') ? 'bg-gray-700' : '' }}">SEO Yönetimi</a>

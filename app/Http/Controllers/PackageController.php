@@ -88,6 +88,17 @@ class PackageController extends Controller
             $query->where('price', '<=', (float) $priceMax);
         }
 
+        // --- Başvuru / müşteri segmenti (Bireysel-Kurumsal) --------------
+        $frontendMode = $request->query('frontend_mode');
+        if ($frontendMode === 'bireysel') {
+            $query->where(function ($q) {
+                $q->whereIn('customer_segment', ['bireysel', 'both'])
+                    ->orWhereNull('customer_segment');
+            });
+        } elseif ($frontendMode === 'kurumsal') {
+            $query->whereIn('customer_segment', ['kurumsal', 'both']);
+        }
+
         // --- Sort --------------------------------------------------------
         $sort = (string) $request->query('sort', 'featured');
         $allowedSort = ['featured', 'price-asc', 'price-desc', 'speed-desc', 'speed-asc'];
@@ -126,13 +137,14 @@ class PackageController extends Controller
             ->first();
 
         $filters = [
-            'operator'       => $operatorIds,
-            'infrastructure' => $infras,
-            'speed'          => $speeds,
-            'modem'          => $modems,
-            'commitment'     => $commitment, // normalize edilmiş 0/1
-            'price_min'      => is_numeric($priceMin) ? (float) $priceMin : null,
-            'price_max'      => is_numeric($priceMax) ? (float) $priceMax : null,
+            'operator'        => $operatorIds,
+            'infrastructure'  => $infras,
+            'speed'           => $speeds,
+            'modem'           => $modems,
+            'commitment'      => $commitment, // normalize edilmiş 0/1
+            'price_min'       => is_numeric($priceMin) ? (float) $priceMin : null,
+            'price_max'       => is_numeric($priceMax) ? (float) $priceMax : null,
+            'frontend_mode'   => in_array($frontendMode, ['bireysel', 'kurumsal'], true) ? $frontendMode : null,
         ];
 
         $hasActiveFilter = ! empty($operatorIds)
@@ -142,6 +154,7 @@ class PackageController extends Controller
             || in_array($commitment, ['0', '1', 'taahhütsüz', 'taahhutlu'], true)
             || $filters['price_min'] !== null
             || $filters['price_max'] !== null
+            || $filters['frontend_mode'] !== null
             ;
 
         return view('frontend.packages.index', compact(
